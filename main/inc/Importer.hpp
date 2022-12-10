@@ -416,13 +416,10 @@ private:
             memcpy(_WIFI_SSID, CONFIG_ESP_WIFI_SSID, strlen(CONFIG_ESP_WIFI_SSID));
             memcpy(_WIFI_PWD, CONFIG_ESP_WIFI_PASSWORD, strlen(CONFIG_ESP_WIFI_PASSWORD));
             memcpy(_APP_SCRIPT_URL, CONFIG_APPSCRIPT_URL, strlen(CONFIG_APPSCRIPT_URL));
-            // tell the caller that cycle shall be read from WIFI since CARD is not ready
-            // ret = WIFI;
-            // ret = ESP_OK;
         }
         else
         {
-            // extract WIFI auth from file in SDCARD
+            // extract WIFI auth and app url from file in SDCARD
 
             const char DELIMITER[] = "\n";
             char *token = strtok(SSIDInfo, DELIMITER); // extracting SSID

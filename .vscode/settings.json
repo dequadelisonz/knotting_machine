@@ -10,5 +10,8 @@
         "istream": "cpp",
         "ostream": "cpp",
         "*.ipp": "cpp"
-    }
+    },
+    "idf.openOcdConfigs": [
+        "board/esp32s3-bridge.cfg"
+    ]
 }

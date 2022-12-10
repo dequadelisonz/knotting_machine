@@ -72,6 +72,25 @@ menu "Knotting cycle settings"
         help
             GPIO number (IOxx) to for CS line of SDD card reader                            
 
+
+    config START_BUTTON_GPIO
+        int "Start button GPIO number"
+        default 47
+        help
+            GPIO number (IOxx) to for START button
+
+    config STOP_BUTTON_GPIO
+        int "Stop button GPIO number"
+        default 48
+        help
+            GPIO number (IOxx) to for STOP button
+                    
+    config MODE_SELECTOR_GPIO
+        int "Mode selector GPIO number"
+        default 21
+        help
+            GPIO number (IOxx) to for MODE SELECTOR                    
+
     config APPSCRIPT_URL
         string "App Script URL"
         default "https://script.google.com/macros/s/AKfycbxiwByQTJMxD0Lf8mMTkOU4wKPetjp4PjLyVwWqRzXLWU4PBJFLEwYahTSXrJis0HB8/exec"
