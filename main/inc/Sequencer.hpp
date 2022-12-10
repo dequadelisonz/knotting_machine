@@ -196,10 +196,6 @@ public:
         return this->_curPass;
     }
 
-    // const char *getCycleCode() const
-    // {
-    //     return _cycleCode;
-    // }
 };
 
 #endif

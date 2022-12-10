@@ -61,7 +61,6 @@ public:
 
     void operator=(const Pass &pass)
     {
-        //ESP_LOGI(TAG, "Copying...");
         this->_id = pass.getId();
         this->_pin = pass.getPin();
         this->_duration = pass.getDuration();
@@ -78,11 +77,6 @@ public:
         ESP_LOGI(TAG, "\t\tStatus: %d", _status);
     }
 
-    // ~Pass()
-    // {
-    //     ESP_LOGI(TAG, "Killing a pass...");
-    //     vTaskDelay(1);
-    // }
 };
 
 #endif
