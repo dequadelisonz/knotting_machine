@@ -1,0 +1,99 @@
+menu "Knotting cycle settings"
+
+    config ESP_WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        help
+            SSID (network name) for the example to connect to.
+
+    config ESP_WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        help
+            WiFi password (WPA or WPA2) for the example to use.
+
+    config ESP_MAXIMUM_RETRY
+        int "Maximum retry"
+        default 5
+        help
+            Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+
+    choice ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD
+        prompt "WiFi Scan auth mode threshold"
+        default ESP_WIFI_AUTH_OPEN
+        help
+            The weakest authmode to accept in the scan mode.
+
+        config ESP_WIFI_AUTH_OPEN
+            bool "OPEN"
+        config ESP_WIFI_AUTH_WEP
+            bool "WEP"
+        config ESP_WIFI_AUTH_WPA_PSK
+            bool "WPA PSK"
+        config ESP_WIFI_AUTH_WPA2_PSK
+            bool "WPA2 PSK"
+        config ESP_WIFI_AUTH_WPA_WPA2_PSK
+            bool "WPA/WPA2 PSK"
+        config ESP_WIFI_AUTH_WPA3_PSK
+            bool "WPA3 PSK"
+        config ESP_WIFI_AUTH_WPA2_WPA3_PSK
+            bool "WPA2/WPA3 PSK"
+        config ESP_WIFI_AUTH_WAPI_PSK
+            bool "WAPI PSK"
+    endchoice
+
+    config MAX_LENGTH_CYCLE_STRING
+        int "Max length of cycle string"
+        default 4096
+        help
+            Set the length of cycle string for knotting machine
+
+    config SDD_MISO_GPIO
+        int "SDD MISO GPIO number"
+        default 37
+        help
+            GPIO number (IOxx) to for MISO line of SDD card reader
+
+    config SDD_MOSI_GPIO
+        int "SDD MOSI GPIO number"
+        default 35
+        help
+            GPIO number (IOxx) to for MOSI line of SDD card reader
+                    
+    config SDD_CLK_GPIO
+        int "SDD CLK GPIO number"
+        default 36
+        help
+            GPIO number (IOxx) to for CLK line of SDD card reader
+                            
+    config SDD_CS_GPIO
+        int "SDD CS GPIO number"
+        default 45
+        help
+            GPIO number (IOxx) to for CS line of SDD card reader                            
+
+    config APPSCRIPT_URL
+        string "App Script URL"
+        default "https://script.google.com/macros/s/AKfycbxiwByQTJMxD0Lf8mMTkOU4wKPetjp4PjLyVwWqRzXLWU4PBJFLEwYahTSXrJis0HB8/exec"
+        help
+            URL of App Script used to download knotting cycle   
+
+    config SDCARD_MOUNT_POINT
+        string "SDcard mount point"
+        default "/sdcard"
+        help
+            SDCARD mounting point             
+
+    config KNOTTING_CYCLE_FILENAME
+        string "Knotting cycle filename"
+        default "/cycle.kno"
+        help
+            File name for knotting machine cycle
+
+    config WIFI_DATA_FILENAME
+        string "Wifi data filename"
+        default "/wifi.kno"
+        help
+            File name for wifi SSID and PWD to be used            
+
+endmenu

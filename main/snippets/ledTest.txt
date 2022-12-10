@@ -1,0 +1,27 @@
+    LedDriver ledDriver;
+
+    ledDriver.blinkTest();
+
+    while (true)
+    {
+        ledDriver.turnOn(4);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOn(5);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOn(6);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOn(7);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOn(15);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOff(4);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOff(5);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOff(6);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOff(7);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+        ledDriver.turnOff(15);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
+    }
