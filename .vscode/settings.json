@@ -9,7 +9,16 @@
         "fstream": "cpp",
         "istream": "cpp",
         "ostream": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "algorithm": "cpp",
+        "limits": "cpp",
+        "mutex": "cpp",
+        "streambuf": "cpp",
+        "thread": "cpp",
+        "regex": "cpp",
+        "tuple": "cpp"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-bridge.cfg"

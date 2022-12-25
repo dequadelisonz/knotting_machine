@@ -34,9 +34,15 @@ private:
             ESP_LOGE(TAG, "Something with control initialization went wrong");
         }
 
+        uint64_t tp1 = esp_timer_get_time();
+        uint64_t tp2 = esp_timer_get_time();
+        uint64_t elapsedTime;
         while (_isRunning)
         {
-            _isRunning = onControlUpdate();
+            tp2 = esp_timer_get_time();
+            elapsedTime = tp2 - tp1;
+            tp1 = tp2;
+            _isRunning = onControlUpdate(elapsedTime);
             vTaskDelay(1);
         }
     }
@@ -55,8 +61,6 @@ private:
         while (_isRunning)
         {
             tp2 = esp_timer_get_time();
-            // printf("Tp1 : %lld\n", tp1);
-            // printf("Tp2 : %lld\n", tp2);
             elapsedTime = tp2 - tp1;
             tp1 = tp2;
             _isRunning = onSequenceUpdate(elapsedTime);
@@ -69,7 +73,7 @@ protected:
 
 public:
     virtual bool onControlCreate() = 0;
-    virtual bool onControlUpdate() = 0;
+    virtual bool onControlUpdate(float elapsedTime) = 0;
     virtual bool onSequenceCreate() = 0;
     virtual bool onSequenceUpdate(float elapsedTime) = 0;
     // virtual bool onUserDestroy() { return true; }

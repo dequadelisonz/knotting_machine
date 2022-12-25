@@ -24,7 +24,6 @@ private:
 public:
     Cycle()
     {
-        // ESP_LOGI(TAG, "------------------------>> My cycle id is : %d", _myId);
     }
 
     esp_err_t pushGroup(Group &group)
@@ -46,25 +45,9 @@ public:
         return ret;
     }
 
-    // int getLastId() const
-    // {
-    //     return _lastId;
-    // }
-
-    // void resetCycle()
-    // {
-    //     printf("Resetting _lastId of CYCLE: %d\n", _lastId);
-    //     //_lastId = 0;
-    // }
-
-    // Group getLastGroup() const
-    // {
-    //     return _groups[_lastId - 1];
-    // }
 
     void logContent()
     {
-        //ESP_LOGI(TAG, "\n********* Logging cycle id %d, _lastId is: %d*********", _myId, _lastId);
         for (int i = 0; i < _lastId; ++i)
         {
             ESP_LOGI(TAG, "Logging group %d\n", i);

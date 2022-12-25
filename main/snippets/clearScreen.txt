@@ -1,0 +1,2 @@
+printf("\033[2J");        /*  clear the screen  */
+printf("\033[H");         /*  position cursor at top-left corner */

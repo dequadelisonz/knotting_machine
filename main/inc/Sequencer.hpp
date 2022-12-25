@@ -57,7 +57,7 @@ private:
 
     Importer _importer; // Sequencer owns a Importer object
 
-    float _curDuration = 0.0f, _curOffset = 0.0f;
+    float _curDuration = 0.0f, _curOffset = 0.0f, _totalDuration = 0.0f;
     Pass *_curPass;
 
     unsigned int _curGroupIndex = 0, _curPassIndex = 0;
@@ -178,6 +178,7 @@ public:
         // update current duration and current pass
         _curDuration = _cycle._groups[_curGroupIndex]._groupDuration;
         _curOffset = _cycle._groups[_curGroupIndex]._groupOffset;
+        _totalDuration = _curDuration + _curOffset;
         _curPass = &(_cycle._groups[_curGroupIndex]._passes[_curPassIndex]);
     }
 
@@ -191,11 +192,15 @@ public:
         return this->_curOffset;
     }
 
+    float getTotalDuration() const
+    {
+        return _totalDuration;
+    }
+
     Pass *getCurPass() const
     {
         return this->_curPass;
     }
-
 };
 
 #endif

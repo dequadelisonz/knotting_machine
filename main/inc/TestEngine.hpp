@@ -17,7 +17,7 @@ class TestEngine : public SequenceEngine
     int butStart = 1;
     int butStop = 0;
     int selModeStatus = 0;
-    int runningStatus = 1;
+    int _runningStatus = 1;
     int stopStatus = 0;
     int selModePrev = 0;
 
@@ -58,10 +58,10 @@ public:
 
     bool onSequenceUpdate(float elapsedTime)
     {
-        if (butStart != runningStatus)
+        if (butStart != _runningStatus)
         {
             ESP_LOGI(TAG, "Pulsante 47 premuto, valore attuale: %d", butStart);
-            runningStatus = butStart;
+            _runningStatus = butStart;
         }
         if (butStop != stopStatus)
         {

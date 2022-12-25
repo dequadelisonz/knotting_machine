@@ -50,8 +50,6 @@
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-// #define HAS_MOVED "<H1>Moved Temporarily</H1>"
-
 static int s_retry_num = 0;
 
 /* FreeRTOS event group to signal when we are connected*/

@@ -99,11 +99,6 @@ public:
         }
     }
 
-    // ~Group()
-    // {
-    //     ESP_LOGI(TAG, "Killing group... %d", _myId);
-    //     vTaskDelay(1);
-    // }
 };
 
 #endif
