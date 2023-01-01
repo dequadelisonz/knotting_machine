@@ -3,6 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := knotting_machine
+PROJECT_NAME := sample_project
 
 include $(IDF_PATH)/make/project.mk

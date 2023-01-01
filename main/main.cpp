@@ -1,55 +1,31 @@
-/*ESP-IDF includes*/
+#include "Sequencer.hpp"
+#include "SDDriver.hpp"
+#include "Sequencer.hpp"
+#include "ImporterSD.hpp"
+#include "ImporterWIFI.hpp"
 
-#include "esp_err.h"
-#include "esp_system.h"
-#include "esp_log.h"
-#include "driver/gpio.h"
-#include "inc/LedDriver.hpp"
-#include "sdkconfig.h"
-
-/*This project includes*/
-// #include "inc/Sequencer.hpp"
-// #include "inc/TestEngine.hpp"
-#include "inc/KnotCycle.hpp"
-
-#define TAG "MAIN"
+#define TAG "main"
 
 extern "C" void app_main(void)
 {
-    ESP_LOGW(TAG, "*******START******");
 
-    KnotCycle knotCycle;
+    ESP_LOGI(TAG, "****************START****************");
+    Sequencer seq;
 
-    knotCycle.start();
+    ESP_LOGI(TAG, "<<<<<<<<<<<<<<<<<<<<<Reading from SD CARD...>>>>>>>>>>>>>>>>>>>>>>>>");
+    ImporterSD impSD(seq);
 
-    // printf("\033[2J"); /*  clear the screen  */
-    // printf("\033[H");  /*  position cursor at top-left corner */
-    // for (int i = 0; i < 10; ++i)
-    // {
-    //     printf("stampo numero: %d\n", i);
-    //     vTaskDelay(100);
-    //     printf("\033[2J"); /*  clear the screen  */
-    //     printf("\033[H");  /*  position cursor at top-left corner */
-    // }
-    // printf("\n");
+    if (impSD.isImported())
+    {
+        seq.parse();
+    }
+    vTaskDelay(1000/portTICK_PERIOD_MS);
+    ESP_LOGI(TAG, "<<<<<<<<<<<<<<<<<<<<<Reading from WIFI...>>>>>>>>>>>>>>>>>>>>>>>>");
+    ImporterWIFI impWIFI(seq);
+    if (impWIFI.isImported())
+    {
+        seq.parse();
+    }
 
-    // Keyboard keyboard;
-
-    // Keyboard::Button keystroke;
-
-    // while (1)
-    // {
-    //     keyboard.updateButtonStatus();
-    //     printf("Stato pulsante DOWN: %d\n", keyboard.getButtonStatus(Keyboard::DOWN));
-    //     printf("Stato pulsante UP: %d\n", keyboard.getButtonStatus(Keyboard::UP));
-    //     printf("Stato pulsante OK: %d\n", keyboard.getButtonStatus(Keyboard::OK));
-    //     // printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-    //     // printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-    //     // printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-    //     vTaskDelay(100 / portTICK_PERIOD_MS);
-    // }
-
-    ESP_LOGW(TAG, "*EXECUTION END*");
+    ESP_LOGI(TAG, "****************END****************");
 }
-
-#undef TAG

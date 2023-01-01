@@ -1,4 +1,0 @@
-menu>   quantità lotto> 200
-        pezzi-ora>      500
-        aggiornamento da SDCARD 
-        aggiornamento da WEB
