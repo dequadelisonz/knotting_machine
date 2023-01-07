@@ -13,6 +13,8 @@
     "idf.flashType": "UART",
     "files.associations": {
         "*.inc": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "typeinfo": "cpp",
+        "functional": "cpp"
     }
 }

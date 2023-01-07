@@ -12,7 +12,7 @@ class Pass
 {
 
 public:
-    static const int MAX_CHAR_DESCR = 31; // define max number of chars for description (including final '\0')
+    static const uint8_t MAX_CHAR_DESCR = 31; // define max number of chars for description (including final '\0')
 
 private:
       const char *TAG = "Pass";

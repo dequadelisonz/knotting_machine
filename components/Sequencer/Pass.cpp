@@ -17,7 +17,7 @@ Pass::Pass(int id,
                           _status(status)
 
 {
-    // clipping secription to max allowed length
+    // clipping name to max allowed length
     int len = (strlen(descr) >= (MAX_CHAR_DESCR - 1)) ? (MAX_CHAR_DESCR - 1) : strlen(descr);
     memcpy(_description, descr, len);
     _description[len] = '\0';

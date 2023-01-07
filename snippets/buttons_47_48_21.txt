@@ -1,0 +1,41 @@
+    gpio_set_direction(GPIO_NUM_47, GPIO_MODE_INPUT);
+    ESP_ERROR_CHECK(gpio_set_pull_mode(GPIO_NUM_47, GPIO_PULLUP_ONLY));
+    gpio_set_direction(GPIO_NUM_48, GPIO_MODE_INPUT);
+    ESP_ERROR_CHECK(gpio_set_pull_mode(GPIO_NUM_48, GPIO_PULLUP_ONLY));
+    gpio_set_direction(GPIO_NUM_21, GPIO_MODE_INPUT);
+    ESP_ERROR_CHECK(gpio_set_pull_mode(GPIO_NUM_21, GPIO_PULLUP_ONLY));
+
+    int but47c = 1;
+    int but48c = 0;
+    int but21c = 0;
+    int but47p = 1;
+    int but48p = 0;
+    int but21p = 0;
+
+    while (1)
+    {
+        but47c = gpio_get_level(GPIO_NUM_47);
+        // ESP_LOGI(TAG, "Pulsante 47 stato attuale: %d", but47c);
+        but48c = gpio_get_level(GPIO_NUM_48);
+        // ESP_LOGI(TAG, "Pulsante 48 stato attuale: %d", but48c);
+        but21c = gpio_get_level(GPIO_NUM_21);
+        // ESP_LOGI(TAG, "Pulsante 21 stato attuale: %d", but21c);
+
+        if (but47c != but47p)
+        {
+            ESP_LOGI(TAG, "Pulsante 47 premuto, valore attuale: %d", but47c);
+            but47p = but47c;
+        }
+        if (but48c != but48p)
+        {
+            ESP_LOGI(TAG, "Pulsante 48 premuto, valore attuale: %d", but48c);
+            but48p = but48c;
+        }
+        if (but21c != but21p)
+        {
+            ESP_LOGI(TAG, "Pulsante 21 premuto, valore attuale: %d", but21c);
+            but21p = but21c;
+        }
+
+        vTaskDelay(1);
+    }
