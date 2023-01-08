@@ -1,0 +1,21 @@
+// #include "MenuKnottingMachine.hpp"
+
+// MenuKnottingMachine::MenuKnottingMachine(int &batchQty,
+//                                          int &pcsPerMin) : _batchQtyME("Quantità lotto", batchQty),
+//                                                            _pcsPerMinME("Pezzi/min", pcsPerMin),
+//                                                            _SDCardUpdME("Aggiornamento SDCARD", dummy),
+//                                                            _WifiUpdME("Aggiornamento WIFI", dummy)
+
+// {
+//     _batchQtyME.setNext(&_pcsPerMinME);
+//     _pcsPerMinME.setNext(&_SDCardUpdME);
+//     _SDCardUpdME.setNext(&_WifiUpdME);
+//     _WifiUpdME.setNext(&_batchQtyME);
+
+//     _currentEntry = _head = &_batchQtyME;
+//     _tail = _head->getPrev();
+
+//     _count();
+
+//     ESP_LOGI(TAG, "Exiting constructor.");
+// }

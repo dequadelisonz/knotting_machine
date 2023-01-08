@@ -6,35 +6,46 @@
 /*ESP-IDF includes*/
 
 /*This project includes*/
-#include "PushButton.hpp"
+#include "RemoteInput.hpp"
 
-class Selector : public Button
+template <typename TClass>
+class Selector : public RemoteInput<TClass>
 {
 private:
   const char *TAG = "Selector";
 
-  const gpio_num_t _pin;
+  gpio_num_t _pin; // not inherited because could not always be a pin
 
-  Button::eButtonLogic _logic;
+  RemoteInputBase::eRemInputLogic _logic;
 
 protected:
   const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
-  FunctorBase &_actionOn, &_actionOff;
+  Functor<TClass> _actionOn, _actionOff;
 
 public:
-  Selector(const char *name,
-           gpio_num_t pin,
-           Button::eButtonLogic logic,
-           FunctorBase &actionOn,
-           FunctorBase &actionOff) : Button(name),
-                                     _pin(pin),
-                                     _logic(logic),
-                                     _actionOn(actionOn),
-                                     _actionOff(actionOff)
+  Selector(){};
+
+  void init(TClass *context,
+            const char *name,
+            gpio_num_t pin,
+            RemoteInputBase::eRemInputLogic logic)
   {
+    RemoteInput<TClass>::init(context, name);
+    _logic = logic;
+    _pin = pin;
     // Change GPIO mapping for control push buttons and selector
     gpio_set_direction(_pin, GPIO_MODE_INPUT); // setting pin as input
     ESP_ERROR_CHECK(gpio_set_pull_mode(pin, GPIO_PULLUP_ONLY));
+  }
+
+  void setActionOn(void (TClass::*fpt)())
+  {
+    _actionOn.setCallee(this->_context, fpt);
+  }
+
+  void setActionOff(void (TClass::*fpt)())
+  {
+    _actionOff.setCallee(this->_context, fpt);
   }
 
   void updateStatus() override
@@ -55,8 +66,8 @@ public:
     first update temporary reading then call base class for debouncing
     */
     // ESP_LOGI(TAG, "pin status %d", gpio_get_level(_pin));
-    _reading = (gpio_get_level(_pin) != _logic);
-    Button::updateStatus();
+    this->_reading = (gpio_get_level(_pin) != _logic);
+    RemoteInput<TClass>::updateStatus();
     // ESP_LOGI(TAG, "updateStatus of %s, _status %d", getName(),_status);
   }
 

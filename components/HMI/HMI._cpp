@@ -1,0 +1,10 @@
+// #include "HMI.hpp"
+
+// HMI::HMI() 
+// {
+// }
+
+// virtual void HMI::updateStatus()
+// {
+//     _inputConsole.updateStatus();
+// }

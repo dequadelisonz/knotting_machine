@@ -6,38 +6,50 @@
 
 /*ESP-IDF includes*/
 #include "driver/gpio.h"
+#include "esp_timer.h"
 
 /*This project includes*/
 #include "Functor.hpp"
+#include "RemoteInputBase.hpp"
 
-class Button
+template <typename TClass>
+class RemoteInput : public RemoteInputBase
 {
-public:
-    enum eButtonLogic
-    {
-        NC = 0,
-        NO = 1,
-    };
-
 private:
-    static const uint8_t MAX_NAME_LENGTH = 12; // inclding final null char
-    const char *TAG = "Button";
+    const char *TAG = "RemoteInput";
 
-    char _name[MAX_NAME_LENGTH] = {0};
+    static const uint8_t MAX_NAME_LENGTH = 12; // inclding final null char
 
 protected:
+    TClass *_context;
+    char _name[MAX_NAME_LENGTH] = {0};
+
     const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
 
-    bool _active = true, _status = false, _prevStatus = false, _reading;
+    bool _active = true;
+    bool _status = false;
+    bool _prevStatus = false;
+    bool _reading = false;
+
     float _lastDebounceTime = 0.0f;
 
+    Functor<TClass> _action;
+
 public:
-    Button(const char *name)
+    RemoteInput(){};
+
+    void init(TClass *context, const char *name)
     {
+        _context = context;
         // clipping name to max allowed length
         int len = (strlen(name) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(name);
         memcpy(_name, name, len);
         _name[len] = '\0';
+    }
+
+    void setAction(void (TClass::*fpt)())
+    {
+        _action.setCallee(_context, fpt);
     }
 
     /*
@@ -45,7 +57,7 @@ public:
    https://www.arduino.cc/en/Tutorial/BuiltInExamples/Debounce
    Before calling in overridden methods --> update "_reading" field of derived class
    */
-    virtual void updateStatus()
+    virtual void updateStatus() override
     {
         // ESP_LOGI(TAG,"updatestatus");
         if (_reading != _prevStatus)
@@ -60,18 +72,18 @@ public:
             if (_reading != _status)
             {
                 _status = _reading;
-                //ESP_LOGI(TAG,"Selector before onStatusChange\n");
+                // ESP_LOGI(TAG,"Selector before onStatusChange\n");
                 onStatusChange(_status);
             }
         }
         _prevStatus = _reading;
     };
 
-    virtual void onStatusChange(bool cond) {} // to be overridden to do something real
+    virtual void onStatusChange(bool cond) = 0; // to be overridden to do something real
 
     const char *getName() const { return _name; }
 
-    bool &setActive() { return _active; }
+    bool &isActive() { return _active; }
 };
 
 #endif

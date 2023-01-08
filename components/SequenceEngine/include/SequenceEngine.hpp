@@ -88,7 +88,7 @@ public:
     void start()
     {
 
-        ESP_LOGI(TAG, "Starting the engine.");
+        ESP_LOGI(TAG, "Starting the engine");
         auto cfg = createConfig("Control thread", 1, 8000, 5);
         esp_pthread_set_cfg(&cfg);
 

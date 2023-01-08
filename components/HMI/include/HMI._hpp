@@ -1,0 +1,26 @@
+// #ifndef Display_hpp
+// #define Display_hpp
+
+// /*STL includes*/
+
+// /*ESP-IDF includes*/
+
+// /*This project includes*/
+// #include "Menu.hpp"
+// #include "InputConsole.hpp"
+
+// class HMI
+// {
+// private:
+//   const char *TAG = "HMI";
+
+//   InputConsole _inputConsole;
+
+// public:
+
+//   HMI();
+
+//   virtual void updateStatus();
+// };
+
+// #endif

@@ -6,33 +6,35 @@
 /*ESP-IDF includes*/
 
 /*This project includes*/
-#include "Button.hpp"
+#include "RemoteInput.hpp"
 
 /*This class defines an object PushButton with PULLUP internal setting*/
-class PushButton : public Button
+template <typename TClass>
+class PushButton : public RemoteInput<TClass>
 {
 
 private:
     const char *TAG = "PushButton";
 
-    const gpio_num_t _pin;
+    gpio_num_t _pin; // not inherited because could not always be a pin
 
-    Button::eButtonLogic _logic;
+    RemoteInputBase::eRemInputLogic _logic;
 
 protected:
     const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
-    FunctorBase &_action;
 
 public:
-    PushButton(const char *name,
-               gpio_num_t pin,
-               Button::eButtonLogic logic,
-               FunctorBase &action) : Button(name),
-                                      _pin(pin),
-                                      _logic(logic),
-                                      _action(action)
+    PushButton(){};
+
+    void init(TClass *context,
+         const char *name,
+         gpio_num_t pin,
+         RemoteInputBase::eRemInputLogic logic)
 
     {
+        RemoteInput<TClass>::init(context, name);
+        _logic = logic;
+        _pin = pin;
         // Change GPIO mapping for control push buttons and selector
         gpio_set_direction(_pin, GPIO_MODE_INPUT); // setting pin as input
         ESP_ERROR_CHECK(gpio_set_pull_mode(pin, GPIO_PULLUP_ONLY));
@@ -56,15 +58,15 @@ public:
         first update temporary reading then call base class for debouncing
         */
         // ESP_LOGI(TAG,"pin status %d",gpio_get_level(_pin));
-        _reading = (gpio_get_level(_pin) != _logic);
-        Button::updateStatus();
+        this->_reading = (gpio_get_level(_pin) != _logic);
+        RemoteInput<TClass>::updateStatus();
         // ESP_LOGI(TAG, "updateStatus of %s, _status %d", getName(),_status);
     }
 
     void onStatusChange(bool cond) override
     {
         if (cond)
-            _action();
+            this->_action();
     }
 };
 
