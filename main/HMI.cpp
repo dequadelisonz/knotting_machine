@@ -42,9 +42,9 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        ret = ret && _inputConsole.addButton(&_btnDOWN);
        ret = ret && _inputConsole.addButton(&_btnOK);
        ret = ret && _inputConsole.addButton(&_selMode);
-       if (!ret) //TODO implementare un controllo errori migliore
+       if (!ret) // TODO implementare un controllo errori migliore
               ESP_LOGE(TAG,
-              "Some remote inputs were not added, check for maximum remote availability.");
+                       "Some remote inputs were not added, check for maximum remote availability.");
        printScreen();
        ESP_LOGI(TAG, "Exiting constructor.");
 }
@@ -52,20 +52,26 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
 void HMI::updateStatus()
 {
        _inputConsole.updateStatus();
-       printScreen();
+       printScreen(_screenContent);
 }
 
 void HMI::printScreen()
 {
-       printf("\033[2J"); /*  clear the screen  */
-       printf("\033[H");  /*  position cursor at top-left corner */
-       _menu.printMenu();
+       clearScreen();
+       printf(_screenContent);
        printf("\nLotto: %d pz;\tPezzi/min:%d\n%s\t%s\n",
               _knotEngine._batchQty,
               _knotEngine._pcsPerMin,
               ((_knotEngine._runningStatus == 1) ? "In funzione" : "Stop"),
               ((_knotEngine._selModeStatus == 1) ? "Automatico" : "Manuale"));
 }
+
+void HMI::printScreen(const char* content)
+{
+       clearScreen();
+       printf(content);
+}
+
 
 /*functions (actions) to be associated with push buttons and menu entries*/
 void HMI::_start()
@@ -76,7 +82,7 @@ void HMI::_start()
 
 void HMI::_stop()
 {
-       printf("Stop\n");
+       //printf("Stop\n");
        _knotEngine._runningStatus = 0;
 }
 
@@ -96,7 +102,8 @@ void HMI::_down()
 
 void HMI::_OK()
 {
-       printf("Ok\n");
+       //printf("Ok\n");
+       _menu.ok();
 }
 
 void HMI::_selON()

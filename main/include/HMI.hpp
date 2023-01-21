@@ -20,6 +20,7 @@ class HMI
 {
 private:
     const char *TAG = "HMI";
+    const char _screenContent[1024]={0};
 
     KnotEngine &_knotEngine;
     Menu<HMI> _menu;
@@ -50,6 +51,10 @@ private:
     void _selOFF();
     
     void printScreen();
+
+    void printScreen(const char* content);
+
+    void clearScreen(){printf("\033[2J\033[H");};
 
 public:
     HMI(KnotEngine &knotEngine);

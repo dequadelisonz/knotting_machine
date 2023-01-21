@@ -3,122 +3,232 @@
 
 /*STL includes*/
 #include "string.h"
-#include "stdio.h"
 
 /*ESP-IDF includes*/
-#include "esp_log.h"
 
 /*This project includes*/
-#include "MenuEntry.hpp"
 
-template <typename TClass>
-class Menu
+namespace MenuNS
 {
+    const uint8_t MAX_NAME_LENGTH = 20; // including final null char
+    const uint8_t MAX_CHILDS = 16;      // max nr. of menu entries in menu
 
-private:
-    const char *TAG = "Menu";
+    class Menu;
 
-    static const uint8_t MAX_ENTRIES = 16; // max nr. of menu entries in menu
-
-    TClass &_context;
-
-    MenuEntry<TClass> *_head = nullptr;
-    MenuEntry<TClass> *_tail = nullptr;
-    MenuEntry<TClass> *_currentEntry = nullptr;
-
-    uint8_t _entriesCount = 0;
-
-    bool _errState = false;
-
-public:
-    Menu(TClass &context);
-
-    void pushBack(MenuEntry<TClass> *entry);
-
-    void forward()
+    class MenuBase
     {
-        do
+    private:
+        const char *TAG = "MenuBase";
+
+    protected:
+        char _descr[MAX_NAME_LENGTH] = {0};
+
+        char _printOut[MAX_CHILDS * (MAX_NAME_LENGTH + 8)] = {0}; // add 8 chars for print markup if needed
+
+        bool _isActive = true, _isSelected = false;
+
+        MenuBase *_prev, *_next, *_current;
+        Menu *_parent;
+
+    public:
+        MenuBase() : _prev(this), _next(this), _parent(this) {}
+
+        const char *getDescription() const { return _descr; }
+
+        bool &isActive() { return _isActive; }
+
+        bool &isSelected() { return _isSelected; }
+
+        MenuBase *getParent() { return _parent; }
+
+        virtual void up() = 0;
+        virtual void down() = 0;
+        virtual void ok() = 0;
+
+        virtual const char *printOut() const = 0;
+    };
+
+    class Menu : public MenuBase
+    {
+
+    private:
+        const char *TAG = "Menu";
+
+        MenuBase *_childsHead = nullptr;
+        MenuBase *_childsTail = nullptr;
+        MenuBase *_currentChild = nullptr;
+        MenuEntry _quitEntry;
+
+        uint8_t _entriesCount = 0; // this istance is an entry in the menu
+
+        // class MenuQuit : public MenuBase
+        // {
+        // private:
+        //     const char *TAG = "MenuQuit";
+
+        // public:
+        //     void up()
+        //     {
+        //     }
+
+        //     void down()
+        //     {
+        //     }
+
+        //     void ok()
+        //     {
+
+        //     }
+        // };
+
+    public:
+        Menu();
+
+        void pushEntry(MenuBase *entry);
+
+        void up() override
         {
-            _currentEntry = _currentEntry->_next;
-        } while (!(_currentEntry->isActive()));
-    }
+            do
+            {
+                _currentChild = _currentChild->_prev;
+            } while (!(_currentChild->isActive()));
+        }
 
-    void backward()
-    {
-        do
+        void down() override
         {
-            _currentEntry = _currentEntry->_prev;
-        } while (!(_currentEntry->isActive()));
-    }
+            do
+            {
+                _currentChild = _currentChild->_next;
+            } while (!(_currentChild->isActive()));
+        }
 
-    void ok()
-    {
-        _currentEntry->action();
-    }
-
-    void printMenu();
-
-    uint8_t getCount() const
-    {
-        return _entriesCount;
-    }
-
-    bool getErrState() const { return _errState; }
-};
-
-#include "Menu.hpp"
-
-template <typename TClass>
-Menu<TClass>::Menu(TClass &context) : _context(context)
-{
-}
-
-template <typename TClass>
-void Menu<TClass>::pushBack(MenuEntry<TClass> *entry)
-{
-    if (_entriesCount < MAX_ENTRIES)
-    {
-        if (_head == nullptr)
+        void ok() override
         {
-            _tail = _head = entry;
+            this->_current = _currentChild;
+        }
+
+        uint8_t getCount() const
+        {
+            return _entriesCount;
+        }
+
+        const char *printOut() const override;
+    };
+
+    Menu::Menu() : _childsHead(this), _childsTail(this), _currentChild(this){}
+    {
+    }
+
+    void Menu::pushEntry(MenuBase *entry)
+    {
+        if (getCount() < MAX_CHILDS)
+        {
+            if (_childsHead == nullptr)
+            {
+                _childsTail = _childsHead = entry;
+            }
+            else
+            {
+                entry->_prev = _childsTail;
+                entry->_next = _childsHead;
+                _childsTail->_next = entry;
+                _childsHead->_prev = entry;
+                _childsTail = entry;
+            }
+            ++_entriesCount;
+            _currentChild = _childsHead;
         }
         else
         {
-            entry->_prev = _tail;
-            entry->_next = _head;
-            _tail->_next = entry;
-            _head->_prev = entry;
-            _tail = entry;
+            _errState = true; // TODO da gestire meglio....
         }
-        ++_entriesCount;
-        _currentEntry = _head;
     }
-    else
+
+    const char *Menu::printOut() const override
     {
-        _errState = true;
+
+        memset(_printOut, 0, sizeof(_printOut));
+
+        MenuEntry<TClass> *cur = _childsHead;
+        do
+        {
+            if (cur == _currentChild)
+            {
+                strcat(_printOut, "> ");
+                strcat(_printOut, cur->getDescription());
+                strcat(_printOut, " <\n");
+                // printf("> %s <\n",cur->getDescription());
+            }
+            else if (!cur->isActive())
+            {
+                strcat(_printOut, "xx ");
+                strcat(_printOut, cur->getDescription());
+                strcat(_printOut, "\n");
+                // printf("xx %s\n",cur->getDescription());
+            }
+            else
+            {
+                strcat(_printOut, cur->getDescription());
+                strcat(_printOut, "\n");
+                // printf("%s\n",cur->getDescription());
+            }
+            cur = cur->_next;
+        } while (cur->_prev != _childsTail);
     }
-}
 
-template <typename TClass>
-void Menu<TClass>::printMenu()
-{
-
-    MenuEntry<TClass> *cur = _head;
-
-    do
+    template <typename TClass>
+    class MenuEntry : public MenuBase
     {
-        if (cur == _currentEntry)
+
+    private:
+        const char *TAG = "MenuEntry";
+
+        TClass *_context;
+
+        Functor<TClass> _functorUp, _functorDown, _functorOk;
+
+    public:
+        // value is a reference to the value to be changed by this menu
+        MenuEntry() : _prev(this),
+                      _next(this)
         {
-            printf("> %s <\n",cur->getDescription());
-        }
-        else if (!cur->isActive())
+            tempValue = value; // priming the tempValue variable
+        };
+
+        void init(TClass *context, const char *descr);
+
+        void setActionUp(void (TClass::*fpt)()) { _functorUp.setCallee(this->_context, fpt); }
+
+        void setActionDown(void (TClass::*fpt)()) { _functorDown.setCallee(this->_context, fpt); }
+
+        void setActionOk(void (TClass::*fpt)()) { _functorOk.setCallee(this->_context, fpt); }
+
+        void up() override { _functorUp.action(); }
+
+        void down() override { _functorDown.action(); }
+
+        void ok() override
         {
-            printf("xx %s\n",cur->getDescription());
+            _functorOk.action();
         }
-        else
-            printf("%s\n",cur->getDescription());
-        cur = cur->_next;
-    } while (cur->_prev != _tail);
+
+        const char *printOut() const override
+        {
+            strcat(this->_printOut, this->TAG);
+            return this->_printOut;
+        }
+    };
+
+    template <typename TClass>
+    void MenuEntry<TClass>::init(TClass *context, const char *descr)
+    {
+        _context = context;
+        // clipping name to max allowed length
+        int len = (strlen(descr) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(descr);
+        memcpy(_descr, descr, len);
+        _descr[len] = '\0';
+    }
+
 }
 
 #endif
