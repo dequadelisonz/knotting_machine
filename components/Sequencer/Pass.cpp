@@ -22,7 +22,7 @@ Pass::Pass(int id,
     memcpy(_description, descr, len);
     _description[len] = '\0';
 
-    gpio_pad_select_gpio(_pin);
+    gpio_reset_pin(_pin);
     gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
 }
 

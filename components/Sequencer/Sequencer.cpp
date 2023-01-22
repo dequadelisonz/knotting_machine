@@ -2,7 +2,7 @@
 
 Sequencer::Sequencer()
 {
-    ESP_LOGI(TAG, "Exiting constructor.");
+    ESP_LOGD(TAG, "Exiting constructor."); //TODO solo per debug
 }
 
 void Sequencer::parse()

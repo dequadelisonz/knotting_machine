@@ -9,6 +9,7 @@
 #include "esp_err.h"
 #include "esp_system.h"
 #include <esp_pthread.h>
+#include "esp_timer.h"
 
 class SequenceEngine
 {

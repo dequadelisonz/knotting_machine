@@ -40,12 +40,12 @@ public:
 
   void setActionOn(void (TClass::*fpt)())
   {
-    _actionOn.setCallee(this->_context, fpt);
+    _actionOn.setCallback(this->_context, fpt);
   }
 
   void setActionOff(void (TClass::*fpt)())
   {
-    _actionOff.setCallee(this->_context, fpt);
+    _actionOff.setCallback(this->_context, fpt);
   }
 
   void updateStatus() override

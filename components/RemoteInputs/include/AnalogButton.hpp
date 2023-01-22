@@ -26,14 +26,13 @@ private:
 
     RemoteInputBase::eBtnLevel _btnLevel;
 
-
 public:
     AnalogButton(){};
 
     void init(TClass *context,
-         const char *name,
-         int adcChannel,
-         RemoteInputBase::eBtnLevel btnLevel)
+              const char *name,
+              int adcChannel,
+              RemoteInputBase::eBtnLevel btnLevel)
     {
         RemoteInput<TClass>::init(context, name);
         _adcChannel = (adc1_channel_t)adcChannel;
@@ -49,7 +48,10 @@ public:
 
     void updateStatus() override
     {
-        this->_reading = (adc1_get_raw(_adcChannel) / 1000) == _btnLevel;
+        //TODO solo debug int raw = adc1_get_raw(_adcChannel);
+        // printf("%d\n", raw);
+        // this->_reading = (raw / 1000) == _btnLevel;
+        this->_reading = (adc1_get_raw(_adcChannel)/ 1000) == _btnLevel;
         RemoteInput<TClass>::updateStatus();
     }
 

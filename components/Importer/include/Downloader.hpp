@@ -6,7 +6,7 @@ This class is helper class to download the cycle sequence from app script
 Usage:
 Instantiate new object giving WIFI SSID and PWD in constructor.
 Then if _downloaded() == true retireve cycle string with getCycleCode()
-else if _downloaded() == false then check for error outpu log about connection --> cycleCode string will be empty
+else if _downloaded() == false then check for error output log about connection --> cycleCode string will be empty
 */
 
 /*STL includes*/
@@ -136,18 +136,27 @@ private:
     switch (evt->event_id)
     {
     case HTTP_EVENT_ERROR:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_ERROR");
       break;
+    }
     case HTTP_EVENT_ON_CONNECTED:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_ON_CONNECTED");
       break;
+    }
     case HTTP_EVENT_HEADER_SENT:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_HEADER_SENT");
       break;
+    }
     case HTTP_EVENT_ON_HEADER:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
       break;
+    }
     case HTTP_EVENT_ON_DATA:
+    {
       ESP_LOGI(TAG, "****HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
       /*
        *  Check for chunked encoding is added as the URL for chunked encoding used in this example returns binary data.
@@ -188,7 +197,9 @@ private:
       if (strstr((const char *)evt->data, HAS_MOVED))
         output_len = 0;
       break;
+    }
     case HTTP_EVENT_ON_FINISH:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_ON_FINISH");
       if (output_buffer != NULL)
       {
@@ -199,7 +210,9 @@ private:
       }
       output_len = 0;
       break;
+    }
     case HTTP_EVENT_DISCONNECTED:
+    {
       ESP_LOGI(TAG, "HTTP_EVENT_DISCONNECTED");
       int mbedtls_err = 0;
       esp_err_t err = esp_tls_get_and_clear_last_error((esp_tls_error_handle_t)evt->data, &mbedtls_err, NULL);
@@ -216,6 +229,11 @@ private:
       output_len = 0;
 
       break;
+    }
+    default:
+    {
+      break;
+    }
     }
     return ESP_OK;
   }

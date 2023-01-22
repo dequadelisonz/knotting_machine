@@ -53,8 +53,8 @@ void Downloader::_wifi_init_sta(void) // helper to startup WIFI
                     {
                         wifi_config_t wifi_config = {
                             .sta = {
-                                // CONFIG_ESP_WIFI_SSID
-                                // CONFIG_ESP_WIFI_PASSWORD,
+                                {},
+                                {},// CONFIG_ESP_WIFI_PASSWORD,
                                 /* Setting a password implies station will connect to all security modes including WEP/WPA.
                                  * However these modes are deprecated and not advisable to be used. Incase your Access point
                                  * doesn't support WPA2, these mode can be enabled by commenting below line */
@@ -64,7 +64,15 @@ void Downloader::_wifi_init_sta(void) // helper to startup WIFI
                                 {},
                                 {},
                                 {},
-                                .threshold = {0, ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD},
+                                //.threshold = {0, ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD},
+                                {0, ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
+                                {},
                                 //{0, {ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD}},
 
                             },
@@ -200,7 +208,7 @@ void Downloader::_download()
         if (_ret == ESP_OK)
         {
             int sc = esp_http_client_get_status_code(_client);
-            ESP_LOGI(TAG, "HTTP chunk encoding Status = %d, content_length = %d",
+            ESP_LOGI(TAG, "HTTP chunk encoding Status = %d, content_length = %lld",
                      sc,
                      esp_http_client_get_content_length(_client));
             strcpy(_cycleCode, s_output_buffer);

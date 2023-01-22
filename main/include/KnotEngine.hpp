@@ -45,21 +45,23 @@ public:
     {
         // ESP_LOGI(TAG,"onControlUpdate");
         _hmi.updateStatus();
-        vTaskDelay(60 / portTICK_PERIOD_MS); // TODO solo per regolare refresh schermo, da rivedere con display finale
+        //vTaskDelay(10 / portTICK_PERIOD_MS); // TODO solo per regolare refresh schermo, da rivedere con display finale
         return true;
     }
 
     virtual bool onSequenceCreate()
     {
-        ImporterSD impSD(_sequencer);//TODO controllo sorgente ciclo, implementare messaggio errore
-        bool ret = impSD.isImported();
-        if (ret)
-        {
-            _sequencer.parse();                                              // TODO implementare un controllo di errore di parsing?
-            _nomPcsPerMin = _pcsPerMin = 60 / _sequencer.getTotalDuration(); // calculate pcs/min from sequencer cycle total duration
-            _kSpeed = _nomPcsPerMin / _pcsPerMin;                            // set _kSpeed proportionally to real pcs/min
-        }
-        return ret;
+        // ImporterSD impSD(_sequencer);//TODO controllo sorgente ciclo, implementare messaggio errore
+        // bool ret = impSD.isImported();
+        // if (ret)
+        // {
+        //     _sequencer.parse();                                              // TODO implementare un controllo di errore di parsing?
+        //     _nomPcsPerMin = _pcsPerMin = 60 / _sequencer.getTotalDuration(); // calculate pcs/min from sequencer cycle total duration
+        //     _kSpeed = _nomPcsPerMin / _pcsPerMin;                            // set _kSpeed proportionally to real pcs/min
+        // }
+        // return ret;
+
+        return true;
     }
 
     virtual bool onSequenceUpdate(uint64_t elapsedTime)

@@ -23,8 +23,8 @@ template <class TClass>
 class Functor : public FunctorBase
 {
 private:
-   void (TClass::*_fpt)(); // pointer to member function
-   TClass *_objPtr;        // pointer to object
+   void (TClass::*_fpt)() = 0; // pointer to member function
+   TClass *_objPtr;            // pointer to object
 
 public:
    Functor() {}
@@ -37,7 +37,7 @@ public:
       _fpt = fpt;
    }
 
-   void setCallee(TClass *objPtr, void (TClass::*fpt)())
+   void setCallback(TClass *objPtr, void (TClass::*fpt)())
    {
       _objPtr = objPtr;
       _fpt = fpt;
@@ -46,13 +46,14 @@ public:
    // override operator "()"
    virtual void operator()() override
    {
-      (*_objPtr.*_fpt)();
+      Call();
    }; // execute member function
 
    // override function "Call"
-   virtual void Call() override
+   inline virtual void Call() override
    {
-      (*_objPtr.*_fpt)();
+      if (_fpt)
+         (*_objPtr.*_fpt)();
    }; // execute member function
 };
 

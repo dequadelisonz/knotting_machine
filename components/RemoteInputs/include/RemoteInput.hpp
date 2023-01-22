@@ -5,6 +5,7 @@
 #include "string.h"
 
 /*ESP-IDF includes*/
+//#include "driver/driver/gpio.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
 
@@ -49,7 +50,7 @@ public:
 
     void setAction(void (TClass::*fpt)())
     {
-        _action.setCallee(_context, fpt);
+        _action.setCallback(_context, fpt);
     }
 
     /*
