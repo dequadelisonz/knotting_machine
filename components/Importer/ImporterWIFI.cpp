@@ -2,7 +2,6 @@
 
 ImporterWIFI::ImporterWIFI(Sequencer &sequencer) : Importer(sequencer)
 {
-    printf("Constructing an importerWIFI...\n");
     if (_isInit)
     {
         _readConnInfo();

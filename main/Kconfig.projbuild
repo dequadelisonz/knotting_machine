@@ -50,25 +50,25 @@ menu "Knotting cycle settings"
 
     config SDD_MISO_GPIO
         int "SDD MISO GPIO number"
-        default 37
+        default 19
         help
             GPIO number (IOxx) to for MISO line of SDD card reader
 
     config SDD_MOSI_GPIO
         int "SDD MOSI GPIO number"
-        default 35
+        default 23
         help
             GPIO number (IOxx) to for MOSI line of SDD card reader
                     
     config SDD_CLK_GPIO
         int "SDD CLK GPIO number"
-        default 36
+        default 18
         help
             GPIO number (IOxx) to for CLK line of SDD card reader
                             
     config SDD_CS_GPIO
         int "SDD CS GPIO number"
-        default 45
+        default 5
         help
             GPIO number (IOxx) to for CS line of SDD card reader                            
 

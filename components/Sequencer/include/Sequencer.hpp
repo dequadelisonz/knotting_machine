@@ -57,10 +57,6 @@ public:
     return this->_curPass;
   }
 
-  ~Sequencer()
-  {
-    printf("Destroying a sequencer....\n");
-  }
 };
 
 #endif

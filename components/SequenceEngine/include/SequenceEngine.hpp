@@ -90,14 +90,14 @@ public:
     {
 
         ESP_LOGI(TAG, "Starting the engine");
-        auto cfg = createConfig("Control thread", 1, 8000, 5);
+        auto cfg = createConfig("Control thread", 1, 16384, 5);
         esp_pthread_set_cfg(&cfg);
 
         ESP_LOGI(TAG, "Creating ctrl thread");
 
         std::thread ctrlThread(&SequenceEngine::controlThread, this);
 
-        cfg = createConfig("Sequence thread", 0, 12000, 5);
+        cfg = createConfig("Sequence thread", 0, 16384, 5);
         esp_pthread_set_cfg(&cfg);
         ESP_LOGI(TAG, "Creating seq thread");
         std::thread seqThread(&SequenceEngine::sequenceThread, this);

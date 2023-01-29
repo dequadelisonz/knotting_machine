@@ -22,12 +22,18 @@ private:
     HMI _hmi;
     Sequencer _sequencer;
 
-    int _batchQty = 250;
-    int _pcsPerMin = 0;
+    uint16_t _batchQty = 250;
+    uint8_t _pcsPerMin = 0;
     uint8_t _nomPcsPerMin = 0;
+    const uint8_t _minPcsPerMin = 1;
+
     uint8_t _runningStatus = 0;
     uint8_t _selModeStatus = 0;
     float _kSpeed = 1.0f;
+
+    bool _updateFromSD();
+
+    bool _updateFromWIFI();
 
 public:
     KnotEngine() : _hmi(*this)
@@ -45,23 +51,13 @@ public:
     {
         // ESP_LOGI(TAG,"onControlUpdate");
         _hmi.updateStatus();
-        //vTaskDelay(10 / portTICK_PERIOD_MS); // TODO solo per regolare refresh schermo, da rivedere con display finale
+        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO solo per regolare refresh schermo, da rivedere con display finale
         return true;
     }
 
     virtual bool onSequenceCreate()
     {
-        // ImporterSD impSD(_sequencer);//TODO controllo sorgente ciclo, implementare messaggio errore
-        // bool ret = impSD.isImported();
-        // if (ret)
-        // {
-        //     _sequencer.parse();                                              // TODO implementare un controllo di errore di parsing?
-        //     _nomPcsPerMin = _pcsPerMin = 60 / _sequencer.getTotalDuration(); // calculate pcs/min from sequencer cycle total duration
-        //     _kSpeed = _nomPcsPerMin / _pcsPerMin;                            // set _kSpeed proportionally to real pcs/min
-        // }
-        // return ret;
-
-        return true;
+        return _updateFromSD();
     }
 
     virtual bool onSequenceUpdate(uint64_t elapsedTime)
@@ -69,14 +65,29 @@ public:
         return true;
     }
 
-    int &getBatchQty()
+    uint16_t &getBatchQty()
     {
         return _batchQty;
     }
 
-    int &getPcsPerMin()
+    uint8_t &getPcsPerMin()
     {
         return _pcsPerMin;
+    }
+
+    const uint8_t getNomPcsPerMin() const
+    {
+        return _nomPcsPerMin;
+    }
+
+    const uint8_t getMinPcsPerMin() const
+    {
+        return _minPcsPerMin;
+    }
+
+    float &getKspeed()
+    {
+        return _kSpeed;
     }
 };
 

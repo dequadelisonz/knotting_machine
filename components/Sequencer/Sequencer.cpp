@@ -2,7 +2,7 @@
 
 Sequencer::Sequencer()
 {
-    ESP_LOGD(TAG, "Exiting constructor."); //TODO solo per debug
+    ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
 }
 
 void Sequencer::parse()
@@ -31,20 +31,31 @@ void Sequencer::parse()
 
     while ((row != NULL) && !isEnd)
     {
-        if (!isEnd)
-        {
+            // printf("%s\n", row);
             id = atoi(row);
             row = strtok(NULL, DELIMITER); // extracting group duration
+
+            //printf("%s\n", row);
             groupDuration = atof(row);
             row = strtok(NULL, DELIMITER); // extracting offset
+
+            //printf("%s\n", row);
             offset = atof(row);
             row = strtok(NULL, DELIMITER); // extracting description
+
+            //printf("%s\n", row);
             strcpy(description, row);
             row = strtok(NULL, DELIMITER); // extracting duration
+
+            //printf("%s\n", row);
             duration = atof(row);
             row = strtok(NULL, DELIMITER); // extracting pin
+
+            //printf("%s\n", row);
             pin = (gpio_num_t)(atoi(row));
             row = strtok(NULL, DELIMITER); // extracting status
+
+            //printf("%s\n", row);
             status = (atoi(row) == 1) ? true : false;
             Pass pass(id,
                       groupDuration,
@@ -53,12 +64,10 @@ void Sequencer::parse()
                       pin,
                       description,
                       status);
-
             ESP_ERROR_CHECK(_cycle._pushPass(pass));
 
             row = strtok(NULL, DELIMITER); // jump end row \n
             isEnd = !(strcmp(row, END));
-        };
     }
     _totalDuration = groupDuration + offset;
     _cycle._logContent();

@@ -148,6 +148,8 @@ void SSD1306_128x64::displayText(int page, char *text, /*int text_len,*/ bool in
 {
     if (page >= PAGES)
         return;
+
+    clearLine(page, false);
     int _text_len = strlen(text);
     if (_text_len > 16)
         _text_len = 16;

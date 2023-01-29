@@ -14,8 +14,8 @@ class ImporterWIFI : public Importer
 private:
     const char *TAG = "ImporterWIFI";
 
-    uint8_t _WIFI_SSID[Downloader::_WIFI_SSID_LEN] = {0};
-    uint8_t _WIFI_PWD[Downloader::_WIFI_PWD_LEN] = {0};
+    char _WIFI_SSID[Downloader::_WIFI_SSID_LEN] = {0};
+    char _WIFI_PWD[Downloader::_WIFI_PWD_LEN] = {0};
     char _APP_SCRIPT_URL[Downloader::_APP_SCR_LEN] = {0};
 
     void _readConnInfo();
@@ -26,7 +26,7 @@ public:
 
     ~ImporterWIFI()
     {
-        printf("Destroying an importer WIFI...\n");
+        ESP_LOGI(TAG, "Downloaded cycle: %s\n", _cycleCode);
     }
 };
 

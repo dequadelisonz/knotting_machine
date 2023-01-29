@@ -1,7 +1,8 @@
 #include "Pass.hpp"
 
 Pass::Pass()
-{}
+{
+}
 
 Pass::Pass(int id,
            float grDur,
@@ -21,14 +22,13 @@ Pass::Pass(int id,
     int len = (strlen(descr) >= (MAX_CHAR_DESCR - 1)) ? (MAX_CHAR_DESCR - 1) : strlen(descr);
     memcpy(_description, descr, len);
     _description[len] = '\0';
-
-    gpio_reset_pin(_pin);
-    gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
+    //gpio_reset_pin(_pin);
+    //gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
 }
 
 void Pass::setOutput()
 {
-    gpio_set_level(_pin, _status);
+    //gpio_set_level(_pin, _status);
 }
 
 void Pass::operator=(const Pass &pass)

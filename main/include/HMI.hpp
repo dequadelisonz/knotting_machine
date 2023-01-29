@@ -18,14 +18,15 @@ class KnotEngine;
 
 class HMI
 {
+
+    friend class StatusLine;
+
 private:
     const char *TAG = "HMI";
     static const int _NR_OF_ROWS = SSD1306_128x64::PAGES;
     static const int _CHARS_IN_ROW = (SSD1306_128x64::WIDTH / Font8x8Ns::WIDTH_OF_CHAR);
     char _screenContent[_NR_OF_ROWS]
                        [_CHARS_IN_ROW] = {0};
-
-    bool _okPressed = false;
 
     KnotEngine &_knotEngine;
     MenuNs::Menu _menu;
@@ -58,21 +59,72 @@ private:
     // void _selON();
     // void _selOFF();
 
-    void _enableWifiME()
+    void _increaseBatch();
+    void _decreaseBatch();
+
+    void _increasePcm();
+    void _decreasePcm();
+
+    void _printScreen();
+
+    void _setMenuCanvas();
+
+    void _updateFromSD();
+    void _updateFromWIFI();
+
+    class StatusLine
     {
-        _WifiUpdME.isActive() = !_WifiUpdME.isActive();
-    }
+        const char *PROMPT = ">";
+        char _statusLine[HMI::_CHARS_IN_ROW];
+        const uint8_t _remLen;
+        HMI &_parent;
 
-    void printScreen();
+        void _setStatus(const char *status)
+        {
+            // TODO make some helper class to clip the length
+            _statusLine[0] = '\0';
+            strcat(_statusLine, PROMPT);
+            strncat(_statusLine, status, _remLen);
+        }
 
-    // void printScreen(const char *content);
+    public:
+        StatusLine(HMI &parent) : _remLen(HMI::_CHARS_IN_ROW - strlen(PROMPT) - 1),
+                                  _parent(parent)
+        {
+        }
 
-    void _setScreenContent();
+        void printStatus()
+        {
+            _parent._display.displayText(7, _statusLine, false);
+        }
+
+        void printStatus(const char *status)
+        {
+            _setStatus(status);
+            _parent._display.displayText(7, _statusLine, false);
+        }
+
+    } _statusLine;
 
 public:
     HMI(KnotEngine &knotEngine);
 
     void updateStatus();
+
+    void printStatus(const char *status)
+    {
+        _statusLine.printStatus(status);
+    }
+
+    void freezeMenu()
+    {
+        _menuNavigator.freezeMenu();
+    }
+
+    void unFreezeMenu()
+    {
+        _menuNavigator.unFreezeMenu();
+    }
 };
 
 #endif

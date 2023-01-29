@@ -30,11 +30,6 @@ protected:
 public:
     Importer(Sequencer &sequencer);
 
-    ~Importer()
-    {
-        printf("Destroying an importer...\n");
-    }
-
     const char *getCycleCode() const { return _cycleCode; }
 
     bool isImported() const

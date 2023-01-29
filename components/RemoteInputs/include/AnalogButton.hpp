@@ -15,7 +15,7 @@ class AnalogButton : public RemoteInput<TClass>
 {
 
 protected:
-    const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
+    const uint64_t DEBOUNCE_TIME = 300; // set a debounce time
 
 private:
     const char *TAG = "AnalogButton";

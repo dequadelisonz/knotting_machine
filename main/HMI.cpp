@@ -3,7 +3,8 @@
 
 HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
                                    _menu("Main", true),
-                                   _menuNavigator(&_menu)
+                                   _menuNavigator(&_menu),
+                                   _statusLine(*this)
 
 {
        /*preparing menu entries*/
@@ -12,9 +13,15 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        _SDCardUpdME.init(this, "Agg. SDCARD");
        _WifiUpdME.init(this, "Agg. WIFI");
 
-       _WifiUpdME.isActive() = false;
+       /*adding action to menu entries*/
+       _batchQtyME.setActionUp(&HMI::_increaseBatch);
+       _batchQtyME.setActionDown(&HMI::_decreaseBatch);
 
-       _batchQtyME.setActionOK(&HMI::_enableWifiME);
+       _pcsPerMinME.setActionUp(&HMI::_increasePcm);
+       _pcsPerMinME.setActionDown(&HMI::_decreasePcm);
+
+       _SDCardUpdME.setActionOK(&HMI::_updateFromSD);
+       _WifiUpdME.setActionOK(&HMI::_updateFromWIFI);
 
        /*adding entries to menu instance*/
        bool ret = true;
@@ -59,35 +66,34 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        _display.clearScreen(false);
        _display.contrast(0xff);
 
-       printScreen();
+       _printScreen();
        ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
 }
 
 void HMI::updateStatus()
 {
        _inputConsole.updateStatus();
-       // printScreen(_screenContent);
+       // _printScreen(_screenContent);
 }
 
-void HMI::printScreen()
+void HMI::_printScreen()
 {
        _display.clearScreen(false);
-       _setScreenContent();
-
-       char status[12] = {0};
-       strcat(status, "Status: ");
-       strcat(status, _okPressed ? "1" : "0");
-
-       _display.displayText(7, status, false);
-       // printf(_screenContent);
-       // printf("\nLotto: %d pz;\tPezzi/min:%d\n%s\t%s\n",
-       //        _knotEngine._batchQty,
-       //        _knotEngine._pcsPerMin,
-       //        ((_knotEngine._runningStatus == 1) ? "In funzione" : "Stop"),
-       //        ((_knotEngine._selModeStatus == 1) ? "Automatico" : "Manuale"));
+       _setMenuCanvas();
+       char status[_CHARS_IN_ROW] = {0};
+       char batch[(_CHARS_IN_ROW - 1) / 2] = {0};
+       char ppm[(_CHARS_IN_ROW - 1) / 2] = {0};
+       sprintf(batch, "%d", _knotEngine._batchQty);
+       sprintf(ppm, "%d", _knotEngine._pcsPerMin);
+       strcat(status, "L:");
+       strcat(status, batch);
+       strcat(status, "-");
+       strcat(status, "p/m:");
+       strcat(status, ppm);
+       printStatus(status);
 }
 
-void HMI::_setScreenContent()
+void HMI::_setMenuCanvas()
 {
        char temp[_NR_OF_ROWS * _CHARS_IN_ROW] = {0};
        strcpy(temp, _menuNavigator.getPrintout());
@@ -101,7 +107,7 @@ void HMI::_setScreenContent()
               bool active = (row[0] != '%');   // check if menu entry is active
               char disEntry[16] = "[D] ";
               if (!active)
-                     strcat(disEntry, &row[(uint8_t)selected]);
+                     strcat(disEntry, &row[(uint8_t)selected + 1]);
               strcpy(_screenContent[i],
                      (active ? &row[(uint8_t)selected] : disEntry)); // if row starts with '>' then hilight and start copy after the square bracket
               _display.displayText(i, _screenContent[i], /* strlen(_screenContent[i]),*/ selected);
@@ -109,12 +115,15 @@ void HMI::_setScreenContent()
        }
 }
 
-// TODO cancellare?
-//  void HMI::printScreen(const char *content)
-//  {
-//         clearScreen();
-//         printf(content);
-//  }
+void HMI::_updateFromSD()
+{
+       _knotEngine._updateFromSD();
+}
+
+void HMI::_updateFromWIFI()
+{
+       _knotEngine._updateFromWIFI();
+}
 
 /*functions (actions) to be associated with push buttons and menu entries*/
 
@@ -134,22 +143,21 @@ void HMI::_up()
 {
        printf("Up\n");
        _menuNavigator.up();
-       printScreen();
+       _printScreen();
 }
 
 void HMI::_down()
 {
        printf("Down\n");
        _menuNavigator.down();
-       printScreen();
+       _printScreen();
 }
 
 void HMI::_OK()
 {
        printf("Ok\n");
        _menuNavigator.ok();
-       _okPressed = !_okPressed;
-       printScreen();
+       _printScreen();
 }
 
 // void HMI::_selON()
@@ -163,3 +171,32 @@ void HMI::_OK()
 //        // printf("Selector OFF\n");
 //        _knotEngine._selModeStatus = 0;
 // }
+
+void HMI::_increaseBatch()
+{
+       _knotEngine.getBatchQty() += 5;
+}
+
+void HMI::_decreaseBatch()
+{
+       _knotEngine.getBatchQty() -= 5;
+}
+
+void HMI::_increasePcm()
+{
+       if (_knotEngine.getPcsPerMin() < _knotEngine.getNomPcsPerMin())
+       {
+              ++_knotEngine.getPcsPerMin();
+              _knotEngine.getKspeed() = _knotEngine.getPcsPerMin() / _knotEngine.getNomPcsPerMin();
+       }
+}
+
+void HMI::_decreasePcm()
+{
+
+       if (_knotEngine.getPcsPerMin() > _knotEngine.getMinPcsPerMin())
+       {
+              --_knotEngine.getPcsPerMin();
+              _knotEngine.getKspeed() = _knotEngine.getPcsPerMin() / _knotEngine.getNomPcsPerMin();
+       }
+}

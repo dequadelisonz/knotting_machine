@@ -27,6 +27,8 @@ private:
     void reset();
     void _logContent();
 
+    Pass _nullPass;
+
 
 public:
 };

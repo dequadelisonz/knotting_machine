@@ -33,6 +33,7 @@ namespace MenuNs
         void _setDescription(const char *descr)
         {
             // clipping name to max allowed length
+            // TODO make some helper class
             int len = (strlen(descr) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(descr);
             memcpy(_descr, descr, len);
             _descr[len] = '\0';
@@ -154,9 +155,7 @@ namespace MenuNs
             MenuBase *getSelf() override { return _parent->_parent; };
 
             const char *printOut() { return _descr; };
-        };
-
-        QuitEntry _quitEntry;
+        } _quitEntry;
 
     public:
         Menu(const char *descr, bool isRoot) : _isRoot(isRoot)
@@ -256,6 +255,8 @@ namespace MenuNs
 
         MenuNs::MenuBase *_cursor;
 
+        bool _isFrozen = false;
+
     public:
         MenuNavigator(MenuNs::Menu *cursor) : _cursor(cursor)
         {
@@ -263,84 +264,37 @@ namespace MenuNs
 
         void up()
         {
-            _cursor = _cursor->up();
+            if (!_isFrozen)
+                _cursor = _cursor->up();
         }
 
         void down()
         {
-            _cursor = _cursor->down();
+            if (!_isFrozen)
+                _cursor = _cursor->down();
         }
+
         void ok()
         {
-            _cursor = _cursor->ok();
+            if (!_isFrozen)
+                _cursor = _cursor->ok();
         }
 
         const char *getPrintout() const
         {
             return _cursor->printOut();
         }
+
+        void freezeMenu()
+        {
+            _isFrozen = true;
+        }
+
+        void unFreezeMenu()
+        {
+            _isFrozen = false;
+        }
     };
-
-    // void MenuBase::_setDescription(const char *descr)
-    // {
-    //     // clipping name to max allowed length
-    //     int len = (strlen(descr) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(descr);
-    //     memcpy(_descr, descr, len);
-    //     _descr[len] = '\0';
-    // }
-
-    // const char *Menu::printOut()
-    // {
-    //     _printOut[0] = '\0';
-    //     MenuBase *cur = _childsHead;
-    //     do
-    //     {
-    //         if (cur == _currentChild) // surround with square brackets current selection
-    //         {
-    //             strcat(_printOut, ">");
-    //             strcat(_printOut, cur->getDescription());
-    //             strcat(_printOut, "<\n");
-    //         }
-    //         else if (!cur->isActive())
-    //         {
-    //             strcat(_printOut, "%"); // put '%' at beginning to mark as inactive menu entry, will be used to invert background
-    //             strcat(_printOut, cur->getDescription());
-    //             strcat(_printOut, "\n");
-    //         }
-    //         else
-    //         {
-    //             strcat(_printOut, cur->getDescription());
-    //             strcat(_printOut, "\n");
-    //         }
-    //         cur = cur->_next;
-    //     } while (cur->_prev != _childsTail);
-
-    //     return _printOut;
-    // };
-
-    // bool Menu::pushEntry(MenuBase *entry)
-    // {
-    //     bool ret = false;
-    //     if (getCount() < MAX_CHILDS)
-    //     {
-    //         entry->_parent = this;
-    //         if (_childsHead == nullptr)
-
-    //             _childsTail = _childsHead = entry;
-
-    //         else
-    //         {
-    //             entry->_prev = _childsTail;
-    //             entry->_next = _childsHead;
-    //             _childsTail->_next = entry;
-    //             _childsHead->_prev = entry;
-    //             _childsTail = entry;
-    //         }
-    //         ++_entriesCount;
-    //         _currentChild = _childsHead;
-    //     }
-    //     return ret;
-    // }
 
 }
 
