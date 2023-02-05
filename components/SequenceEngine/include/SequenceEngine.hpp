@@ -79,11 +79,11 @@ public:
     virtual bool onSequenceUpdate(uint64_t elapsedTime) = 0;
     // virtual bool onUserDestroy() { return true; }
 
-    virtual void fun(){}
+    //virtual void fun(){} //TODO cancellare se non serve
 
     SequenceEngine()
     {
-        ESP_LOGI(TAG, "Creating a new CycleEngine");
+        //ESP_LOGI(TAG, "Creating a new CycleEngine");
     }
 
     void start()

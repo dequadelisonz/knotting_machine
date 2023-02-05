@@ -25,8 +25,13 @@ private:
 
   Cycle _cycle; // Sequencer owns a Cycle object
 
+  uint8_t _curPassIndex = 0;
+
   float _curDuration = 0.0f, _curOffset = 0.0f, _totalDuration = 0.0f;
-  Pass *_curPass;
+  uint8_t _curPin = 0;
+  bool _curStatus = false;
+
+  //Pass *_curPass;
 
   bool _isAtBegin = true;
 
@@ -37,26 +42,20 @@ public:
 
   bool advance();
 
-  float getCurDuration() const
-  {
-    return this->_curDuration;
-  }
+  float getCurDuration() const { return this->_curDuration; }
 
-  float getCurOffset() const
-  {
-    return this->_curOffset;
-  }
+  float getCurOffset() const { return this->_curOffset; }
 
-  float getTotalDuration() const
-  {
-    return _totalDuration;
-  }
+  uint8_t getCurPin() const { return this->_curPin; }
 
-  Pass *getCurPass() const
-  {
-    return this->_curPass;
-  }
+  bool getCurStatus() const { return this->_curStatus; }
 
+  float getTotalDuration() const { return _totalDuration; }
+
+  // Pass *getCurPass() const
+  // {
+  //   return this->_curPass;
+  // }
 };
 
 #endif

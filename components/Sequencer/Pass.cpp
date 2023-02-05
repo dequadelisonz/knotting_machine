@@ -8,7 +8,7 @@ Pass::Pass(int id,
            float grDur,
            float offset,
            float dur,
-           gpio_num_t pin,
+           uint8_t pin,
            const char *descr,
            bool status) : _id(id),
                           _groupDuration(grDur),
@@ -19,16 +19,10 @@ Pass::Pass(int id,
 
 {
     // clipping name to max allowed length
-    int len = (strlen(descr) >= (MAX_CHAR_DESCR - 1)) ? (MAX_CHAR_DESCR - 1) : strlen(descr);
-    memcpy(_description, descr, len);
-    _description[len] = '\0';
-    //gpio_reset_pin(_pin);
-    //gpio_set_direction(_pin, GPIO_MODE_OUTPUT);
-}
-
-void Pass::setOutput()
-{
-    //gpio_set_level(_pin, _status);
+    strncat(_description,descr,MAX_CHAR_DESCR-1);
+    // int len = (strlen(descr) >= (MAX_CHAR_DESCR - 1)) ? (MAX_CHAR_DESCR - 1) : strlen(descr);
+    // memcpy(_description, descr, len);
+    // _description[len] = '\0';
 }
 
 void Pass::operator=(const Pass &pass)
@@ -42,7 +36,7 @@ void Pass::operator=(const Pass &pass)
     this->_status = pass.getStatus();
 }
 
-void Pass::logContent()
+void Pass::_logContent()
 {
     ESP_LOGI(TAG, "\t\tPass id: %d", _id);
     ESP_LOGI(TAG, "\t\tGroup duration: %4.3f", _groupDuration);

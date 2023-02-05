@@ -23,6 +23,8 @@ class HMI
 
 private:
     const char *TAG = "HMI";
+
+    /*OLED display section*/
     static const int _NR_OF_ROWS = SSD1306_128x64::PAGES;
     static const int _CHARS_IN_ROW = (SSD1306_128x64::WIDTH / Font8x8Ns::WIDTH_OF_CHAR);
     char _screenContent[_NR_OF_ROWS]
@@ -33,12 +35,16 @@ private:
     MenuNs::MenuNavigator _menuNavigator;
 
     // declaring remote inputs (pushbuttons, selectors, analogbuttons, etc.)
-    // PushButton<HMI> _btnStart;
-    // PushButton<HMI> _btnStop;
+
+    // anaog buttons on MCU
     AnalogButton<HMI> _btnUP;
     AnalogButton<HMI> _btnDOWN;
     AnalogButton<HMI> _btnOK;
-    // Selector<HMI> _5selMode;
+
+    // discrete buttons on panel
+    PushButton<HMI> _btnStart;
+    PushButton<HMI> _btnStop;
+    Selector<HMI> _selMode;
 
     // declaring menu entries
     MenuNs::MenuEntry<HMI> _batchQtyME;
@@ -51,13 +57,19 @@ private:
     SSD1306_128x64 _display;
 
     /*functions (actions) to be associated with push buttons and menu entries*/
-    // void _start();
-    // void _stop();
+
+    // anaog buttons on MCU
     void _up();
     void _down();
     void _OK();
-    // void _selON();
-    // void _selOFF();
+
+    // discrete buttons on panel
+    void _start();
+    void _stop();
+    void _selON();
+    void _selOFF();
+
+    /*functions (actions) to be associated with menu entries */
 
     void _increaseBatch();
     void _decreaseBatch();
@@ -65,12 +77,14 @@ private:
     void _increasePcm();
     void _decreasePcm();
 
+    void _updateFromSD();
+    void _updateFromWIFI();
+
+
+    /* display update helper functions */
     void _printScreen();
 
     void _setMenuCanvas();
-
-    void _updateFromSD();
-    void _updateFromWIFI();
 
     class StatusLine
     {

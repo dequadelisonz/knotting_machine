@@ -1,5 +1,9 @@
 #include "KnotEngine.hpp"
 
+KnotEngine::KnotEngine() : _hmi(*this), _gpOutArr(_expAddresses)
+{
+}
+
 bool KnotEngine::_updateFromSD()
 {
     _hmi.freezeMenu();

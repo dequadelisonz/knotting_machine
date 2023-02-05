@@ -24,7 +24,7 @@ public:
 private:
     const char *TAG = "SSD1306_128x64";
 
-    const int _ADDRESS = 0x3C;
+    const int _address = 0x3C;
     const i2c_port_t _I2C_NUM = 0;
 
     I2CMasterSocket &_i2cSocket;

@@ -24,13 +24,13 @@ private:
 
     Cycle();
     esp_err_t _pushPass(Pass const &pass);
-    void reset();
+    void _reset();
     void _logContent();
 
-    Pass _nullPass;
-
+    const Pass _nullPass;
 
 public:
+
 };
 
 #endif

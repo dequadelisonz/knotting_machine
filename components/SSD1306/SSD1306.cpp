@@ -27,7 +27,7 @@ void SSD1306_128x64::_displayImage(int page, int seg, uint8_t *images, int width
 
     cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (_ADDRESS << 1) | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, (_address << 1) | I2C_MASTER_WRITE, true);
 
     i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_STREAM, true);
     // Set Lower Column Start Address for Page Addressing Mode
@@ -43,7 +43,7 @@ void SSD1306_128x64::_displayImage(int page, int seg, uint8_t *images, int width
 
     cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (_ADDRESS << 1) | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, (_address << 1) | I2C_MASTER_WRITE, true);
 
     i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_DATA_STREAM, true);
     i2c_master_write(cmd, images, width, true);
@@ -63,7 +63,7 @@ SSD1306_128x64::SSD1306_128x64() : _i2cSocket(I2CMasterSocket::getIstance(_I2C_N
 
     // build up the command "cmd" to be sent to display for initialization
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (_ADDRESS << 1) | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, (_address << 1) | I2C_MASTER_WRITE, true);
     i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_STREAM, true);
     i2c_master_write_byte(cmd, OLED_CMD_DISPLAY_OFF, true);        // AE
     i2c_master_write_byte(cmd, OLED_CMD_SET_MUX_RATIO, true);      // A8
@@ -116,7 +116,7 @@ void SSD1306_128x64::contrast(int contrast)
 
     cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (_ADDRESS << 1) | I2C_MASTER_WRITE, true);
+    i2c_master_write_byte(cmd, (_address << 1) | I2C_MASTER_WRITE, true);
     i2c_master_write_byte(cmd, OLED_CONTROL_BYTE_CMD_STREAM, true);
     i2c_master_write_byte(cmd, OLED_CMD_SET_CONTRAST, true); // 81
     i2c_master_write_byte(cmd, _contrast, true);

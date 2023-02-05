@@ -35,30 +35,35 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
                        "Some menu entry were not added, check for maximum menu entry availability.");
 
        /*preparing hardware remote inputs (buttons, etc.)*/
-       //_btnStart.init(this, "Start", (gpio_num_t)CONFIG_START_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NO);
-       //_btnStop.init(this, "Stop", (gpio_num_t)CONFIG_STOP_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NC);
+
        _btnUP.init(this, "UP", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::UP);
        _btnDOWN.init(this, "DOWN", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::DOWN);
        _btnOK.init(this, "OK", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::OK);
-       //_selMode.init(this, "ModeSel", (gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NC);
+
+       _btnStart.init(this, "Start", (gpio_num_t)CONFIG_START_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NO);
+       _btnStop.init(this, "Stop", (gpio_num_t)CONFIG_STOP_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NC);
+       _selMode.init(this, "ModeSel", (gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NC);
 
        /*binding to HMI's functions (actions)*/
-       //_btnStart.setAction(&HMI::_start);
-       //_btnStop.setAction(&HMI::_stop);
        _btnUP.setAction(&HMI::_up);
        _btnDOWN.setAction(&HMI::_down);
        _btnOK.setAction(&HMI::_OK);
-       //_selMode.setActionOn(&HMI::_selON);
-       //_selMode.setActionOff(&HMI::_selOFF);
+
+       _btnStart.setAction(&HMI::_start);
+       _btnStop.setAction(&HMI::_stop);
+       _selMode.setActionOn(&HMI::_selON);
+       _selMode.setActionOff(&HMI::_selOFF);
 
        // register remote inputs (buttons,etc.) in input console
        ret = true;
-       // ret = ret && _inputConsole.addButton(&_btnStart);
-       // ret = ret && _inputConsole.addButton(&_btnStop);
        ret = ret && _inputConsole.addButton(&_btnUP);
        ret = ret && _inputConsole.addButton(&_btnDOWN);
        ret = ret && _inputConsole.addButton(&_btnOK);
-       // ret = ret && _inputConsole.addButton(&_selMode);
+
+       ret = ret && _inputConsole.addButton(&_btnStart);
+       ret = ret && _inputConsole.addButton(&_btnStop);
+       ret = ret && _inputConsole.addButton(&_selMode);
+
        if (!ret) // TODO implementare un controllo errori migliore
               ESP_LOGE(TAG,
                        "Some remote inputs were not added, check for maximum remote availability.");
@@ -67,13 +72,99 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        _display.contrast(0xff);
 
        _printScreen();
-       ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
+       // ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
 }
 
 void HMI::updateStatus()
 {
        _inputConsole.updateStatus();
-       // _printScreen(_screenContent);
+}
+
+void HMI::_updateFromSD()
+{
+       _knotEngine._updateFromSD();
+}
+
+void HMI::_updateFromWIFI()
+{
+       _knotEngine._updateFromWIFI();
+}
+
+/*functions (actions) to be associated with push buttons and menu entries*/
+
+void HMI::_up()
+{
+       printf("Up\n");
+       _menuNavigator.up();
+       _printScreen();
+}
+
+void HMI::_down()
+{
+       printf("Down\n");
+       _menuNavigator.down();
+       _printScreen();
+}
+
+void HMI::_OK()
+{
+       printf("Ok\n");
+       _menuNavigator.ok();
+       _printScreen();
+}
+
+void HMI::_start()
+{
+       //printf("Start\n");
+       _knotEngine._runningStatus = 1;//TODO mutex!
+}
+
+void HMI::_stop()
+{
+       //printf("Stop\n");
+       _knotEngine._runningStatus = 0;//TODO mutex!
+}
+
+void HMI::_selON()
+{
+       //printf("Selector ON\n");
+       _knotEngine._selModeStatus = 1;//TODO mutex!
+}
+
+void HMI::_selOFF()
+{
+       //printf("Selector OFF\n");
+       _knotEngine._selModeStatus = 0;//TODO mutex!
+}
+
+void HMI::_increaseBatch()
+{
+       _knotEngine.getBatchQty() += 5;
+}
+
+void HMI::_decreaseBatch()
+{
+       if (!(_knotEngine.getBatchQty() < 6))
+              _knotEngine.getBatchQty() -= 5;
+}
+
+void HMI::_increasePcm()
+{
+       if (_knotEngine.getPcsPerMin() < _knotEngine.getNomPcsPerMin())
+       {
+              ++_knotEngine.getPcsPerMin();
+              _knotEngine.getKspeed() = _knotEngine.getNomPcsPerMin() / _knotEngine.getPcsPerMin();
+       }
+}
+
+void HMI::_decreasePcm()
+{
+
+       if (_knotEngine.getPcsPerMin() > _knotEngine.getMinPcsPerMin())
+       {
+              --_knotEngine.getPcsPerMin();
+              _knotEngine.getKspeed() = _knotEngine.getNomPcsPerMin() / _knotEngine.getPcsPerMin();
+       }
 }
 
 void HMI::_printScreen()
@@ -105,98 +196,12 @@ void HMI::_setMenuCanvas()
        {
               bool selected = (row[0] == '>'); // check if menu entry is selected
               bool active = (row[0] != '%');   // check if menu entry is active
-              char disEntry[16] = "[D] ";
+              char disEntry[_CHARS_IN_ROW] = "[D] ";
               if (!active)
-                     strcat(disEntry, &row[(uint8_t)selected + 1]);
+                     strcat(disEntry, &row[(uint8_t)selected + 1]); // if selected, copy the string starting from 2nd index
               strcpy(_screenContent[i],
                      (active ? &row[(uint8_t)selected] : disEntry)); // if row starts with '>' then hilight and start copy after the square bracket
               _display.displayText(i, _screenContent[i], /* strlen(_screenContent[i]),*/ selected);
               row = strtok(NULL, delimiter);
-       }
-}
-
-void HMI::_updateFromSD()
-{
-       _knotEngine._updateFromSD();
-}
-
-void HMI::_updateFromWIFI()
-{
-       _knotEngine._updateFromWIFI();
-}
-
-/*functions (actions) to be associated with push buttons and menu entries*/
-
-// void HMI::_start()
-// {
-//        // printf("Start\n");
-//        _knotEngine._runningStatus = 1;
-// }
-
-// void HMI::_stop()
-// {
-//        // printf("Stop\n");
-//        _knotEngine._runningStatus = 0;
-// }
-
-void HMI::_up()
-{
-       printf("Up\n");
-       _menuNavigator.up();
-       _printScreen();
-}
-
-void HMI::_down()
-{
-       printf("Down\n");
-       _menuNavigator.down();
-       _printScreen();
-}
-
-void HMI::_OK()
-{
-       printf("Ok\n");
-       _menuNavigator.ok();
-       _printScreen();
-}
-
-// void HMI::_selON()
-// {
-//        // printf("Selector ON\n");
-//        _knotEngine._selModeStatus = 1;
-// }
-
-// void HMI::_selOFF()
-// {
-//        // printf("Selector OFF\n");
-//        _knotEngine._selModeStatus = 0;
-// }
-
-void HMI::_increaseBatch()
-{
-       _knotEngine.getBatchQty() += 5;
-}
-
-void HMI::_decreaseBatch()
-{
-       _knotEngine.getBatchQty() -= 5;
-}
-
-void HMI::_increasePcm()
-{
-       if (_knotEngine.getPcsPerMin() < _knotEngine.getNomPcsPerMin())
-       {
-              ++_knotEngine.getPcsPerMin();
-              _knotEngine.getKspeed() = _knotEngine.getPcsPerMin() / _knotEngine.getNomPcsPerMin();
-       }
-}
-
-void HMI::_decreasePcm()
-{
-
-       if (_knotEngine.getPcsPerMin() > _knotEngine.getMinPcsPerMin())
-       {
-              --_knotEngine.getPcsPerMin();
-              _knotEngine.getKspeed() = _knotEngine.getPcsPerMin() / _knotEngine.getNomPcsPerMin();
        }
 }
