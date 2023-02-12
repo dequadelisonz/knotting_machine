@@ -16,11 +16,6 @@ private:
 
 public:
     ImporterSD(Sequencer &sequencer);
-
-    ~ImporterSD()
-    {
-        printf("Destroying an importer SD...\n");
-    }
 };
 
 #endif

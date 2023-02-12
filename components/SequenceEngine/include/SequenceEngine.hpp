@@ -54,7 +54,15 @@ private:
         {
             _isRunning = false;
             ESP_LOGE(TAG, "Something with sequence initialization went wrong");
+            return;
         }
+
+        auto cfg = createConfig("Control thread", 1, 16384, 5);
+        esp_pthread_set_cfg(&cfg);
+
+        ESP_LOGI(TAG, "Creating ctrl thread");
+
+        std::thread ctrlThread(&SequenceEngine::controlThread, this);
 
         uint64_t tp1 = esp_timer_get_time();
         uint64_t tp2 = esp_timer_get_time();
@@ -67,6 +75,7 @@ private:
             _isRunning = onSequenceUpdate(elapsedTime);
             vTaskDelay(1);
         }
+        ctrlThread.join();
     }
 
 protected:
@@ -79,30 +88,32 @@ public:
     virtual bool onSequenceUpdate(uint64_t elapsedTime) = 0;
     // virtual bool onUserDestroy() { return true; }
 
-    //virtual void fun(){} //TODO cancellare se non serve
+    // virtual void fun(){} //TODO cancellare se non serve
 
     SequenceEngine()
     {
-        //ESP_LOGI(TAG, "Creating a new CycleEngine");
+        // ESP_LOGI(TAG, "Creating a new CycleEngine");
     }
 
     void start()
     {
 
         ESP_LOGI(TAG, "Starting the engine");
-        auto cfg = createConfig("Control thread", 1, 16384, 5);
-        esp_pthread_set_cfg(&cfg);
 
-        ESP_LOGI(TAG, "Creating ctrl thread");
+        /***MOVED TO The Sequence Thread ****/
+        // auto cfg = createConfig("Control thread", 1, 16384, 5);
+        // esp_pthread_set_cfg(&cfg);
 
-        std::thread ctrlThread(&SequenceEngine::controlThread, this);
+        // ESP_LOGI(TAG, "Creating ctrl thread");
 
-        cfg = createConfig("Sequence thread", 0, 16384, 5);
+        // std::thread ctrlThread(&SequenceEngine::controlThread, this);
+
+        auto cfg = createConfig("Sequence thread", 0, 16384, 5);
         esp_pthread_set_cfg(&cfg);
         ESP_LOGI(TAG, "Creating seq thread");
         std::thread seqThread(&SequenceEngine::sequenceThread, this);
 
-        ctrlThread.join();
+        // ctrlThread.join();
         seqThread.join();
     };
 };

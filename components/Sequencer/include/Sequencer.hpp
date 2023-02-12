@@ -25,13 +25,13 @@ private:
 
   Cycle _cycle; // Sequencer owns a Cycle object
 
-  uint8_t _curPassIndex = 0;
+  uint8_t _curPassIndex = 0U;
 
+  uint8_t _curId = 0U;
+  char _curDecription[Pass::MAX_CHAR_DESCR] = {0};
   float _curDuration = 0.0f, _curOffset = 0.0f, _totalDuration = 0.0f;
-  uint8_t _curPin = 0;
+  uint8_t _curPin = 0U;
   bool _curStatus = false;
-
-  //Pass *_curPass;
 
   bool _isAtBegin = true;
 
@@ -40,22 +40,21 @@ public:
 
   void parse();
 
-  bool advance();
+  bool const advance();
 
-  float getCurDuration() const { return this->_curDuration; }
+  float const getCurDuration() const { return this->_curDuration; }
 
-  float getCurOffset() const { return this->_curOffset; }
+  float const getCurOffset() const { return this->_curOffset; }
 
-  uint8_t getCurPin() const { return this->_curPin; }
+  uint8_t const getCurPin() const { return this->_curPin; }
 
-  bool getCurStatus() const { return this->_curStatus; }
+  bool const getCurStatus() const { return this->_curStatus; }
 
-  float getTotalDuration() const { return _totalDuration; }
+  float const getTotalDuration() const { return _totalDuration; }
 
-  // Pass *getCurPass() const
-  // {
-  //   return this->_curPass;
-  // }
+  uint8_t const getCurId() const { return _curId; }
+
+  char const *getCurDescription() const { return _curDecription; }
 };
 
 #endif

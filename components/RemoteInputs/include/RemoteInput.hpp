@@ -18,13 +18,13 @@ class RemoteInput : public RemoteInputBase
 private:
     const char *TAG = "RemoteInput";
 
-    static const uint8_t MAX_NAME_LENGTH = 12; // inclding final null char
+    static const uint8_t MAX_NAME_LENGTH = 12U; // inclding final null char
 
 protected:
     TClass *_context;
     char _name[MAX_NAME_LENGTH] = {0};
 
-    const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
+    const uint64_t DEBOUNCE_TIME = 200U; // set a debounce time
 
     bool _active = true;
     bool _status = false;

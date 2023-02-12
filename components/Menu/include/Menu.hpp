@@ -11,8 +11,8 @@
 
 namespace MenuNs
 {
-    const unsigned short int MAX_NAME_LENGTH = 17; // including final null char - related to display available length
-    const unsigned short int MAX_CHILDS = 16;      // max nr. of menu entries in menu
+    const uint8_t MAX_NAME_LENGTH = 17U; // including final null char - related to display available length
+    const uint8_t MAX_CHILDS = 16U;      // max nr. of menu entries in menu
 
     /*******MenuBase******/
 
@@ -34,9 +34,11 @@ namespace MenuNs
         {
             // clipping name to max allowed length
             // TODO make some helper class
-            int len = (strlen(descr) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(descr);
-            memcpy(_descr, descr, len);
-            _descr[len] = '\0';
+            // int len = (strlen(descr) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(descr);
+            // memcpy(_descr, descr, len);
+            // _descr[len] = '\0';
+            strncpy(_descr, descr, MAX_NAME_LENGTH - 1);
+            ESP_LOGI(TAG, "Now ME descr is: %s", _descr); // TODO solo debug
         }
 
     public:
@@ -44,7 +46,8 @@ namespace MenuNs
 
         const char *getDescription() const { return _descr; }
 
-        virtual bool &isActive() { return _isActive; }
+        virtual bool isActive() const { return _isActive; }
+        virtual void setIsActive(bool status) { _isActive = status; }
 
         virtual MenuBase *up() = 0;
         virtual MenuBase *down() = 0;
@@ -90,21 +93,44 @@ namespace MenuNs
             _functorOK.setCallback(_context, fpt);
         }
 
+        virtual void setIsActive(bool status)
+        {
+            if (status != _isActive)
+            {
+                char temp[MAX_NAME_LENGTH] = {0};
+                if (!status)
+                {
+                    strcat(temp, "%"); // put '%' at beginning to mark as inactive menu entry, will be used for display rendering
+                    strcat(temp, getDescription());
+                    _setDescription(temp);
+                }
+                else
+                {
+                    strcpy(temp, &getDescription()[1]);
+                    _setDescription(temp);
+                }
+            }
+            _isActive = status;
+        }
+
         MenuBase *up() override
         {
-            _functorUp();
+            if (this->_isActive)
+                _functorUp();
             return this;
         }
 
         MenuBase *down() override
         {
-            _functorDown();
+            if (this->_isActive)
+                _functorDown();
             return this;
         }
 
         MenuBase *ok() override
         {
-            _functorOK();
+            if (this->_isActive)
+                _functorOK();
             return _parent;
         }
 
@@ -143,10 +169,15 @@ namespace MenuNs
         public:
             QuitEntry() { strcpy(_descr, "<- Exit"); }
 
-            virtual bool &isActive()
+            virtual bool isActive() //_isaActive of quiteEntry must be always true
             {
                 this->_isActive = true;
                 return _isActive;
+            }
+
+            virtual void setIsActive(bool status) //_isaActive of quiteEntry must be always true
+            {
+                _isActive = true;
             }
 
             MenuBase *up() override { return this; };
@@ -204,12 +235,12 @@ namespace MenuNs
                     strcat(_printOut, cur->getDescription());
                     strcat(_printOut, "\n");
                 }
-                else if (!cur->isActive())
-                {
-                    strcat(_printOut, "%"); // put '%' at beginning to mark as inactive menu entry, will be used to invert background
-                    strcat(_printOut, cur->getDescription());
-                    strcat(_printOut, "\n");
-                }
+                // else if (!cur->isActive())
+                // {
+                //     strcat(_printOut, "%"); // put '%' at beginning to mark as inactive menu entry, will be used to invert background
+                //     strcat(_printOut, cur->getDescription());
+                //     strcat(_printOut, "\n");
+                // }
                 else
                 {
                     strcat(_printOut, cur->getDescription());
@@ -217,7 +248,7 @@ namespace MenuNs
                 }
                 cur = cur->_next;
             } while (cur->_prev != _childsTail);
-
+            ESP_LOGI(TAG, "\n%s", _printOut); // TODO rimuovere dopo debug
             return _printOut;
         };
 

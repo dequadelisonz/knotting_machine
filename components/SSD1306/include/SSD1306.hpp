@@ -17,14 +17,14 @@ class SSD1306_128x64
 {
 
 public:
-    static const int WIDTH = 128;
-    static const int HEIGHT = 64;
-    static const int PAGES = 8;
+    static const uint8_t WIDTH = 128U;
+    static const uint8_t HEIGHT = 64U;
+    static const uint8_t PAGES = 8U;
 
 private:
     const char *TAG = "SSD1306_128x64";
 
-    const int _address = 0x3C;
+    const uint8_t _address = 0x3C;
     const i2c_port_t _I2C_NUM = 0;
 
     I2CMasterSocket &_i2cSocket;

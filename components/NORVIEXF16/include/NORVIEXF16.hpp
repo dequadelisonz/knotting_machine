@@ -54,7 +54,7 @@ private:
         MCP23017_OLAT = 0x0A
     };
 
-    uint8_t _address = 0x27;
+    uint8_t _address = 0x27U;
     const i2c_port_t _I2C_NUM = 0;
 
     I2CMasterSocket &_i2cSocket;

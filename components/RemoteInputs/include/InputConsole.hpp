@@ -13,9 +13,9 @@ class InputConsole
 private:
     const char *TAG = "InputConsole";
 
-    static const uint8_t MAX_INPUTS = 16; // max nr. of buttons in keyboard
+    static const uint8_t MAX_INPUTS = 16U; // max nr. of buttons in keyboard
 
-    uint8_t _top = 0;
+    uint8_t _top = 0U;
 
     RemoteInputBase *_butArr[MAX_INPUTS];
 

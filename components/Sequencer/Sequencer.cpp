@@ -16,11 +16,11 @@ void Sequencer::parse()
 
     ESP_LOGI(TAG, "%s", _cycleCode);
 
-    int id = 0;
+    uint8_t id = 0U;
     float groupDuration = 0.0f;
     float offset = 0.0f;
     float duration = 0.0f;
-    uint8_t pin = 0;
+    uint8_t pin = 0U;
     char description[Pass::MAX_CHAR_DESCR] = {0};
     bool status = false;
 
@@ -29,31 +29,31 @@ void Sequencer::parse()
 
     while ((row != NULL) && !isEnd)
     {
-        printf("id: %s\n", row);
+        //printf("id: %s\n", row);
         id = atoi(row);
 
         row = strtok(NULL, DELIMITER); // extracting group duration
-        printf("Duration: %s\n", row);
+        //printf("Duration: %s\n", row);
         groupDuration = atof(row);
 
         row = strtok(NULL, DELIMITER); // extracting offset
-        printf("Offset: %s\n", row);
+        //printf("Offset: %s\n", row);
         offset = atof(row);
 
         row = strtok(NULL, DELIMITER); // extracting description
-        printf("Descr. %s\n", row);
+        //printf("Descr. %s\n", row);
         strncpy(description, row, Pass::MAX_CHAR_DESCR - 1);
 
         row = strtok(NULL, DELIMITER); // extracting duration
-        printf("Duration: %s\n", row);
+        //printf("Duration: %s\n", row);
         duration = atof(row);
 
         row = strtok(NULL, DELIMITER); // extracting pin
-        printf("Pin: %s\n", row);
+        //printf("Pin: %s\n", row);
         pin = atoi(row);
 
         row = strtok(NULL, DELIMITER); // extracting status
-        printf("Status: %s\n", row);
+        //printf("Status: %s\n", row);
         status = (atoi(row) == 1) ? true : false;
 
         Pass pass(id,
@@ -70,46 +70,28 @@ void Sequencer::parse()
     }
     _totalDuration = groupDuration + offset;
     _cycle._logContent();
+
+    //priming cycle index - set position to last pass (_lastId-1) and then advance to get first position
+    _curPassIndex=_cycle._lastId-1;
+    advance();
 }
 
-bool Sequencer::advance()
+bool const Sequencer::advance()
 {
     ++_curPassIndex;
     _isAtBegin = false;
 
     if (_curPassIndex == _cycle._lastId)
     {
-        _curPassIndex = 0;
+        _curPassIndex = 0U;
         _isAtBegin = true;
     }
+    _curId=_cycle._passes[_curPassIndex].getId();
     _curDuration = _cycle._passes[_curPassIndex].getDuration();
     _curOffset = _cycle._passes[_curPassIndex].getOffset();
+    strcpy( _curDecription,_cycle._passes[_curPassIndex].getDescription());
     _curPin = _cycle._passes[_curPassIndex].getPin();
     _curStatus = _cycle._passes[_curPassIndex].getStatus();
-
-    // // advance current pass index
-    // ++_curPassIndex;
-    // _isAtBegin = false; // after the first advance we are no more at the beginning
-
-    // // if current pass index is over the content limit (i.e. equal to _lastId)
-    // // then _reset to 0 to restart
-    // if (_curPassIndex == _cycle._groups[_curGroupIndex]._lastId)
-    // {
-    //     _curPassIndex = 0;
-
-    //     // do the same for the current group index
-    //     ++_curGroupIndex;
-    //     if (_curGroupIndex == _cycle._lastId)
-    //     {
-    //         _curGroupIndex = 0;
-    //         _isAtBegin = true; // if current group index is reset to 0 then we are at the beginning
-    //     }
-    // };
-
-    // // update current duration and current pass
-    // _curDuration = _cycle._groups[_curGroupIndex]._groupDuration;
-    // _curOffset = _cycle._groups[_curGroupIndex]._groupOffset;
-    // _curPass = &(_cycle._groups[_curGroupIndex]._passes[_curPassIndex]);
 
     return  _isAtBegin;
 }

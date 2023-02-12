@@ -54,9 +54,9 @@ class Downloader
 {
 
 public:
-  static const uint8_t _WIFI_SSID_LEN = 32;
-  static const uint8_t _WIFI_PWD_LEN = 64;
-  static const uint8_t _APP_SCR_LEN = 255;
+  static const uint8_t _WIFI_SSID_LEN = 32U;
+  static const uint8_t _WIFI_PWD_LEN = 64U;
+  static const uint8_t _APP_SCR_LEN = 255U;
 
 private:
   static char TAG[];
@@ -69,7 +69,7 @@ private:
 
   static EventGroupHandle_t s_wifi_event_group;
   static char s_output_buffer[CONFIG_MAX_LENGTH_CYCLE_STRING];
-  static int s_retry_num;
+  static uint8_t s_retry_num;
 
   esp_http_client_handle_t _client;
 

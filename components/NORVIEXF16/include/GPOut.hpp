@@ -13,11 +13,11 @@ class GPOutArray
 public:
     const char *TAG = "GPOutArray";
 
-    static constexpr uint8_t MAX_GPOut = 16;
-    static constexpr uint8_t MAX_EXPANSIONS = 6;
+    static constexpr uint8_t MAX_GPOut = 16U;
+    static constexpr uint8_t MAX_EXPANSIONS = 6U;
 
 private:
-    uint8_t _expansionQty = 0;
+    uint8_t _expansionQty = 0U;
 
     class GPOutPin
     {
@@ -113,11 +113,9 @@ private:
     esp_err_t _setGPOStatus(uint8_t const gpo, uint8_t v, bool const on);
 
 public:
-    GPOutArray(const int addresses[MAX_EXPANSIONS]);
+    GPOutArray(const uint8_t addresses[MAX_EXPANSIONS]);
 
-    esp_err_t setOn(uint8_t gpo);
-
-    esp_err_t setOff(uint8_t gpo);
+    esp_err_t set(uint8_t gpo, uint8_t status);
 };
 
 #endif

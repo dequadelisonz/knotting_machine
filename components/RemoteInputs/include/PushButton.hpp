@@ -21,7 +21,7 @@ private:
     RemoteInputBase::eRemInputLogic _logic;
 
 protected:
-    const uint64_t DEBOUNCE_TIME = 200; // set a debounce time
+    const uint64_t DEBOUNCE_TIME = 200U; // set a debounce time
 
 public:
     PushButton(){};

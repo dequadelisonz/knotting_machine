@@ -31,7 +31,7 @@ esp_err_t Cycle::_pushPass(Pass const &pass)
 
 void Cycle::_reset()
 {
-    _lastId = 0;
+    _lastId = 0U;
 }
 
 void Cycle::_logContent()

@@ -7,7 +7,7 @@ char Downloader::s_output_buffer[CONFIG_MAX_LENGTH_CYCLE_STRING] = {0};
 
 EventGroupHandle_t Downloader::s_wifi_event_group = NULL;
 
-int Downloader::s_retry_num = 0;
+uint8_t Downloader::s_retry_num = 0U;
 
 Downloader::Downloader(const char *const wifiSSID,
                        const char *const wifiPWD,
@@ -47,7 +47,7 @@ void Downloader::_wifiEventHandler(void *arg, esp_event_base_t event_base,
     {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-        s_retry_num = 0;
+        s_retry_num = 0U;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
 }
@@ -247,7 +247,7 @@ esp_err_t Downloader::_httpEventHandler(esp_http_client_event_t *evt)
                 if (output_buffer == NULL)
                 {
                     output_buffer = (char *)malloc(esp_http_client_get_content_length(evt->client));
-                    output_len = 0;
+                    output_len = 0U;
 
                     if (output_buffer == NULL)
                     {
@@ -266,7 +266,7 @@ esp_err_t Downloader::_httpEventHandler(esp_http_client_event_t *evt)
         printf(Downloader::s_output_buffer);
         output_len += evt->data_len;
         if (strstr((const char *)evt->data, HAS_MOVED))
-            output_len = 0;
+            output_len = 0U;
         break;
     }
     case HTTP_EVENT_ON_FINISH:
@@ -279,7 +279,7 @@ esp_err_t Downloader::_httpEventHandler(esp_http_client_event_t *evt)
             free(output_buffer);
             output_buffer = NULL;
         }
-        output_len = 0;
+        output_len = 0U;
         break;
     }
     case HTTP_EVENT_DISCONNECTED:
@@ -297,7 +297,7 @@ esp_err_t Downloader::_httpEventHandler(esp_http_client_event_t *evt)
             free(output_buffer);
             output_buffer = NULL;
         }
-        output_len = 0;
+        output_len = 0U;
 
         break;
     }

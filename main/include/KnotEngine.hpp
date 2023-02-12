@@ -20,26 +20,31 @@ class KnotEngine : public SequenceEngine
 
 private:
     const char *TAG = "KnotEngine";
-    HMI _hmi;
     Sequencer _sequencer;
-    uint64_t _timer = 0;
+    HMI _hmi;
+    uint64_t _timer = 0U;
 
     bool _isAtBegin = true;
-    uint8_t _runningStatus = 0;
-    uint8_t _selModeStatus = 0;
+    bool _readyToRun = true;
 
-    const int _expAddresses[GPOutArray::MAX_EXPANSIONS] = {0x27, 0x00, 0x0, 0x0, 0x0, 0x0}; // TODO inserire in menuconfig
+    uint8_t _run = 0U;
+    uint8_t _runningStatus = 0U; // used to activate or deactivate HMI statuses
+    uint8_t _selModeStatus = 0U;
+    static pthread_mutex_t _cycleStatusM;
+
+    const uint8_t _expAddresses[GPOutArray::MAX_EXPANSIONS] = {0x27U, 0x00U, 0x0U, 0x0U, 0x0U, 0x0U}; // TODO inserire in menuconfig
     GPOutArray _gpOutArr;
 
-    const TickType_t delay = 2000 / portTICK_PERIOD_MS; // TODO rimuovere dopo test
+    // const TickType_t delay = 2000 / portTICK_PERIOD_MS; // TODO rimuovere dopo test
 
-    uint16_t _batchQty = 250;
-    uint8_t _pcsPerMin = 0;
-    uint8_t _nomPcsPerMin = 0;
-    const uint8_t _minPcsPerMin = 1;
+    uint16_t _batchQty = 100U;
+    uint16_t _processedItems = 0;
+    uint8_t _pcsPerMin = 0U;
+    uint8_t _nomPcsPerMin = 0U;
+    const uint8_t _minPcsPerMin = 1U;
 
-    float _curDuration = 0.0f,
-          _curOffset = 0.0f,
+    uint64_t _curDuration = 0U;
+    float _curOffset = 0.0f,
           _kSpeed = 1.0f;
 
     bool _updateFromSD();
@@ -49,83 +54,126 @@ private:
 public:
     KnotEngine();
 
+    /*running on control thread*/
     virtual bool onControlCreate()
     {
-        bool ret = true;
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
-        return ret;
+        return _readyToRun;
     }
     virtual bool onControlUpdate(uint64_t elapsedTime)
     {
-        // ESP_LOGI(TAG,"onControlUpdate");
         _hmi.updateStatus();
-        // vTaskDelay(10 / portTICK_PERIOD_MS); // TODO solo per regolare refresh schermo, da rivedere con display finale
-        return true;
+        return _readyToRun;
     }
 
+    /*running on sequence thread*/
     virtual bool onSequenceCreate()
     {
-        return _updateFromSD();
+        return (this->_updateFromSD() && _readyToRun);
     }
 
     virtual bool onSequenceUpdate(uint64_t elapsedTime)
     {
-
-        switch (_selModeStatus)
+        switch (getSelMode())
         {
         case 0:
-            if (_runningStatus)
+            if (getRunStatus() == 1)
             {
                 while (_curOffset == _sequencer.getCurOffset()) // then cycle through a group to perform passes
                 {
-                    printf("pin: %d\tstatus: %s\n", _sequencer.getCurPin(), _sequencer.getCurStatus() ? "on" : "off");
+                    printf("id: %d,\tdescr: %s,\tpin: %d\tstatus: %s\n",
+                           _sequencer.getCurId(),
+                           _sequencer.getCurDescription(),
+                           _sequencer.getCurPin(),
+                           _sequencer.getCurStatus() ? "on" : "off");
+                    _gpOutArr.set(_sequencer.getCurPin(), _sequencer.getCurStatus());
                     _sequencer.advance();
                 }
                 _curOffset = _sequencer.getCurOffset(); // set the current offset ready for the next group of passes
-                // vTaskDelay(300 / portTICK_PERIOD_MS);
-                _runningStatus = 0; // set _runningStatus to 0 after performing the pass
+                setRunStatus(0);                        // set _run to 0 after performing the pass
             }
 
             break;
         case 1:
+            // if running status is no more 1 and cycle arrives at the beginning (!_isAtBegin == 0) then stop the cycle because user pushed the stop button
+            if (getRunStatus() || !_isAtBegin)
+            {
+                // printf("_run: %d\t_isAtBegin: %s\t_remQty: %d\n", _getRunStatus(), _isAtBegin ? "true" : "false", _processedItems);
+                if (_timer <= _curDuration)
+                {
+                    while (_curOffset == _sequencer.getCurOffset())
+                    {
+                        // printf("id: %d,\tdescr: %s,\tpin: %d\tstatus: %s\n",
+                        //        _sequencer.getCurId(),
+                        //        _sequencer.getCurDescription(),
+                        //        _sequencer.getCurPin(),
+                        //        _sequencer.getCurStatus() ? "on" : "off");
+                        _gpOutArr.set(_sequencer.getCurPin(), _sequencer.getCurStatus());
+                        _isAtBegin = _sequencer.advance();
+                        /*
+                        After processing a group of passes, if cycle is at begin position
+                        then increase processed item and if difference with _batchQty
+                        (which may change over time) is =0 then stop automatic cycle
+                        and reset _processedItems to 0
+                        */
+                        if (_isAtBegin)
+                        {
+                            ++_processedItems;
+                            _hmi.setRePaintStatus(true);
+                            if ((_batchQty - _processedItems) == 0)
+                            {
+                                // TODO mettere qui codice gestione sirena
+                                setRunStatus(0);
+                                _processedItems = 0;
+                            }
+                        }
+                    };
+                }
+                else
+                {
+                    _timer = 0U;
+                    _curDuration = (uint64_t)(_sequencer.getCurDuration() * 1000000 * getKspeed());
+                    _curOffset = _sequencer.getCurOffset();
+                }
 
-            // _gpOutArr.setOn(1);
-            // vTaskDelay(200 / portTICK_PERIOD_MS);
-            // _gpOutArr.setOff(1);
-            // vTaskDelay(200 / portTICK_PERIOD_MS);
+                // ESP_LOGI(TAG, "Running status: %d\t isAtBegin: %d", _run, _isAtBegin);
+            }
+            else
+            {
+                // if getRunStatus() = 0 and _isAtBegin=0 then set _runningStatus to 0
+                setRunningStatus(0U);
+            }
 
             break;
         }
 
         _timer += elapsedTime;
 
-        return true;
+        return _readyToRun;
     }
 
-    uint16_t &getBatchQty()
-    {
-        return _batchQty;
-    }
+    void setRunStatus(uint8_t status);
 
-    uint8_t &getPcsPerMin()
-    {
-        return _pcsPerMin;
-    }
+    uint8_t getRunStatus() const { return _run; }
 
-    const uint8_t getNomPcsPerMin() const
-    {
-        return _nomPcsPerMin;
-    }
+    void setRunningStatus(uint8_t status);
 
-    const uint8_t getMinPcsPerMin() const
-    {
-        return _minPcsPerMin;
-    }
+    uint8_t getRunningStatus() const { return _runningStatus; }
 
-    float &getKspeed()
-    {
-        return _kSpeed;
-    }
+    void setSelMode(uint8_t status);
+
+    uint8_t getSelMode() const { return _selModeStatus; }
+
+    uint16_t &getBatchQty() { return _batchQty; }
+
+    uint16_t const &getProcessedItems() const { return _processedItems; }
+
+    uint8_t &getPcsPerMin() { return _pcsPerMin; }
+
+    const uint8_t getNomPcsPerMin() const { return _nomPcsPerMin; }
+
+    const uint8_t getMinPcsPerMin() const { return _minPcsPerMin; }
+
+    float &getKspeed() { return _kSpeed; }
 };
 
 #endif

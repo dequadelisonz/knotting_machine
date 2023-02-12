@@ -1,12 +1,22 @@
 #include "HMI.hpp"
 #include "KnotEngine.hpp"
 
+pthread_mutex_t HMI::_rePaintStatusM = 0;
+
 HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
                                    _menu("Main", true),
                                    _menuNavigator(&_menu),
-                                   _statusLine(*this)
+                                   _sl6(*this, 6),
+                                   _sl7(*this, 7)
 
 {
+       ESP_LOGI(TAG, "Constructing HMI...");
+
+       if (pthread_mutex_init(&HMI::_rePaintStatusM, NULL) != 0)
+       {
+              ESP_LOGE(TAG, "Failed to init mutex");
+       }
+
        /*preparing menu entries*/
        _batchQtyME.init(this, "Q.ta lotto");
        _pcsPerMinME.init(this, "Pezzi/min");
@@ -71,23 +81,56 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        _display.clearScreen(false);
        _display.contrast(0xff);
 
-       _printScreen();
+       _display.displayText(0, "Macchina", true);
+       _display.displayText(1, "     Annodatrice", true);
+       _display.displayText(3, "*** v. 1.0 ***", true);
+
        // ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
 }
 
 void HMI::updateStatus()
 {
        _inputConsole.updateStatus();
+
+       if (_knotEngine.getRunStatus() == 1U)
+       //(_knotEngine.getRunningStatus() == 1U)
+       {
+              _WifiUpdME.setIsActive(false);
+              _SDCardUpdME.setIsActive(false);
+       }
+       else if ( //(_knotEngine.getRunningStatus() == 0U) &&
+           _knotEngine.getRunStatus() == 0U)
+       {
+              _WifiUpdME.setIsActive(true);
+              _SDCardUpdME.setIsActive(true);
+       };
+
+       if (getRePaintStatus())
+       {
+              ESP_LOGI(TAG, "Repainting...");
+              _printScreen();
+              setRePaintStatus(false);
+       }
+}
+
+void HMI::printStatus(const char *status6, const char *status7)
+{
+       _sl6.printStatus(status6);
+       _sl7.printStatus(status7);
 }
 
 void HMI::_updateFromSD()
 {
+       _menuNavigator.freezeMenu();
        _knotEngine._updateFromSD();
+       _menuNavigator.unFreezeMenu();
 }
 
 void HMI::_updateFromWIFI()
 {
+       _menuNavigator.freezeMenu();
        _knotEngine._updateFromWIFI();
+       _menuNavigator.unFreezeMenu();
 }
 
 /*functions (actions) to be associated with push buttons and menu entries*/
@@ -96,56 +139,60 @@ void HMI::_up()
 {
        printf("Up\n");
        _menuNavigator.up();
-       _printScreen();
+       setRePaintStatus(true);
 }
 
 void HMI::_down()
 {
        printf("Down\n");
        _menuNavigator.down();
-       _printScreen();
+       setRePaintStatus(true);
 }
 
 void HMI::_OK()
 {
        printf("Ok\n");
        _menuNavigator.ok();
-       _printScreen();
+       setRePaintStatus(true);
 }
 
 void HMI::_start()
 {
-       //printf("Start\n");
-       _knotEngine._runningStatus = 1;//TODO mutex!
+       printf("Start ON\n");
+       _knotEngine.setRunStatus(1U);
+       setRePaintStatus(true);
 }
 
 void HMI::_stop()
 {
-       //printf("Stop\n");
-       _knotEngine._runningStatus = 0;//TODO mutex!
+       printf("Stop ON\n");
+       _knotEngine.setRunStatus(0U);
+       setRePaintStatus(true);
 }
 
 void HMI::_selON()
 {
-       //printf("Selector ON\n");
-       _knotEngine._selModeStatus = 1;//TODO mutex!
+       printf("Selector ON\n");
+       _knotEngine.setSelMode(1U);
+       setRePaintStatus(true);
 }
 
 void HMI::_selOFF()
 {
-       //printf("Selector OFF\n");
-       _knotEngine._selModeStatus = 0;//TODO mutex!
+       printf("Selector OFF\n");
+       _knotEngine.setSelMode(0U);
+       setRePaintStatus(true);
 }
 
 void HMI::_increaseBatch()
 {
-       _knotEngine.getBatchQty() += 5;
+       _knotEngine.getBatchQty() += 1; // TODO rivedere in funzione di utilizzo
 }
 
 void HMI::_decreaseBatch()
 {
-       if (!(_knotEngine.getBatchQty() < 6))
-              _knotEngine.getBatchQty() -= 5;
+       // if (!(_knotEngine.getBatchQty() < 6))//TODO rivedere in funzione di utilizzo
+       _knotEngine.getBatchQty() -= 1;
 }
 
 void HMI::_increasePcm()
@@ -171,17 +218,31 @@ void HMI::_printScreen()
 {
        _display.clearScreen(false);
        _setMenuCanvas();
-       char status[_CHARS_IN_ROW] = {0};
+       char status6[_CHARS_IN_ROW] = {0};
+       char remItems[(_CHARS_IN_ROW - 1) / 2] = {0};
+       char autoMode[(_CHARS_IN_ROW - 1) / 2] = {0};
+       sprintf(remItems, "%d", _knotEngine._batchQty - _knotEngine._processedItems);
+       bool st = false;
+       if (_knotEngine.getSelMode() == 1)
+              st = true;
+       sprintf(autoMode, "%s", st ? "auto" : "man.");
+       strcat(status6, "R:");
+       strcat(status6, remItems);
+       strcat(status6, "-");
+       strcat(status6, "modo:");
+       strcat(status6, autoMode);
+
+       char status7[_CHARS_IN_ROW] = {0};
        char batch[(_CHARS_IN_ROW - 1) / 2] = {0};
        char ppm[(_CHARS_IN_ROW - 1) / 2] = {0};
        sprintf(batch, "%d", _knotEngine._batchQty);
        sprintf(ppm, "%d", _knotEngine._pcsPerMin);
-       strcat(status, "L:");
-       strcat(status, batch);
-       strcat(status, "-");
-       strcat(status, "p/m:");
-       strcat(status, ppm);
-       printStatus(status);
+       strcat(status7, "L:");
+       strcat(status7, batch);
+       strcat(status7, "-");
+       strcat(status7, "p/m:");
+       strcat(status7, ppm);
+       printStatus(status6, status7);
 }
 
 void HMI::_setMenuCanvas()
@@ -203,5 +264,16 @@ void HMI::_setMenuCanvas()
                      (active ? &row[(uint8_t)selected] : disEntry)); // if row starts with '>' then hilight and start copy after the square bracket
               _display.displayText(i, _screenContent[i], /* strlen(_screenContent[i]),*/ selected);
               row = strtok(NULL, delimiter);
+       }
+}
+
+void HMI::setRePaintStatus(bool status)
+{
+       ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
+       if (pthread_mutex_lock(&_rePaintStatusM) == 0)
+       {
+              _rePaint = status;
+              // Unlock once operations are done
+              pthread_mutex_unlock(&_rePaintStatusM);
        }
 }

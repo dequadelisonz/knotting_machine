@@ -5,6 +5,8 @@
 
 /*ESP-IDF includes*/
 #include "esp_log.h"
+#include <esp_pthread.h>
+#include <thread>
 
 /*This project includes*/
 #include "InputConsole.hpp"
@@ -30,13 +32,19 @@ private:
     char _screenContent[_NR_OF_ROWS]
                        [_CHARS_IN_ROW] = {0};
 
+    SSD1306_128x64 _display;
+
+    static pthread_mutex_t _rePaintStatusM;
+    bool _rePaint = false;
+
     KnotEngine &_knotEngine;
+
     MenuNs::Menu _menu;
     MenuNs::MenuNavigator _menuNavigator;
 
     // declaring remote inputs (pushbuttons, selectors, analogbuttons, etc.)
 
-    // anaog buttons on MCU
+    // analog buttons on MCU
     AnalogButton<HMI> _btnUP;
     AnalogButton<HMI> _btnDOWN;
     AnalogButton<HMI> _btnOK;
@@ -53,8 +61,6 @@ private:
     MenuNs::MenuEntry<HMI> _WifiUpdME;
 
     InputConsole _inputConsole;
-
-    SSD1306_128x64 _display;
 
     /*functions (actions) to be associated with push buttons and menu entries*/
 
@@ -80,7 +86,6 @@ private:
     void _updateFromSD();
     void _updateFromWIFI();
 
-
     /* display update helper functions */
     void _printScreen();
 
@@ -88,10 +93,13 @@ private:
 
     class StatusLine
     {
+    private:
+        const char *TAG = "StatusLine";
         const char *PROMPT = ">";
         char _statusLine[HMI::_CHARS_IN_ROW];
         const uint8_t _remLen;
         HMI &_parent;
+        const uint8_t _row;
 
         void _setStatus(const char *status)
         {
@@ -102,43 +110,38 @@ private:
         }
 
     public:
-        StatusLine(HMI &parent) : _remLen(HMI::_CHARS_IN_ROW - strlen(PROMPT) - 1),
-                                  _parent(parent)
+        StatusLine(HMI &parent, uint8_t row) : _remLen(HMI::_CHARS_IN_ROW - strlen(PROMPT) - 1),
+                                               _parent(parent),
+                                               _row(row)
         {
         }
 
         void printStatus()
         {
-            _parent._display.displayText(7, _statusLine, false);
+            //ESP_LOGI(TAG, "%s", _statusLine);
+            _parent._display.displayText(_row, _statusLine, false);
         }
 
         void printStatus(const char *status)
         {
             _setStatus(status);
-            _parent._display.displayText(7, _statusLine, false);
+            printStatus();
         }
+    };
 
-    } _statusLine;
+    StatusLine _sl6;
+    StatusLine _sl7;
 
 public:
     HMI(KnotEngine &knotEngine);
 
     void updateStatus();
 
-    void printStatus(const char *status)
-    {
-        _statusLine.printStatus(status);
-    }
+    void printStatus(const char *status6, const char *status7);
 
-    void freezeMenu()
-    {
-        _menuNavigator.freezeMenu();
-    }
+    void setRePaintStatus(bool status);
 
-    void unFreezeMenu()
-    {
-        _menuNavigator.unFreezeMenu();
-    }
+    bool getRePaintStatus() const { return _rePaint; }
 };
 
 #endif

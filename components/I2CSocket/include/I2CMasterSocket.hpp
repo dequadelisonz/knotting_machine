@@ -14,7 +14,7 @@ class I2CMasterSocket
 {
 private:
     const char *TAG = "I2CMasterSocket";
-    const uint32_t I2C_MASTER_FREQ_HZ = 400000; /*!< I2C clock of SSD1306 can run at 400 kHz max. */
+    const uint32_t I2C_MASTER_FREQ_HZ = 400000U; /*!< I2C clock of SSD1306 can run at 400 kHz max. */
 
     i2c_config_t _i2c_config;
     i2c_port_t _i2cPort;
@@ -29,7 +29,7 @@ private:
             .scl_pullup_en = GPIO_PULLUP_ENABLE,
             .master = {
                 .clk_speed = I2C_MASTER_FREQ_HZ},
-            .clk_flags = 0};
+            .clk_flags = 0U};
         ESP_ERROR_CHECK(i2c_param_config(_i2cPort, &_i2c_config));
         ESP_ERROR_CHECK(i2c_driver_install(_i2cPort, I2C_MODE_MASTER, 0, 0, 0));
 

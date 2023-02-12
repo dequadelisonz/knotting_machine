@@ -12,16 +12,16 @@ class Pass
     friend class Cycle;
 
 public:
-    static const uint8_t MAX_CHAR_DESCR = 31; // define max number of chars for description (including final '\0')
+    static const uint8_t MAX_CHAR_DESCR = 31U; // define max number of chars for description (including final '\0')
 
 private:
     const char *TAG = "Pass";
 
-    int _id = 0;
+    uint8_t _id = 0U;
     float _groupDuration = 0.0f;
     float _offset = 0.0f;
     float _duration = 0.0f;
-    uint8_t _pin = 0;
+    uint8_t _pin = 0U;
     char _description[MAX_CHAR_DESCR] = {0};
     bool _status = false;
 
