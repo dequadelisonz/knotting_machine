@@ -17,6 +17,7 @@ class NORVIEXF16
     friend class GPOutArray;
 
 private:
+
     const char *TAG = "NORVIEXF16";
 
     /*

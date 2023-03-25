@@ -52,7 +52,7 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
 
        _btnStart.init(this, "Start", (gpio_num_t)CONFIG_START_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NO);
        _btnStop.init(this, "Stop", (gpio_num_t)CONFIG_STOP_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NC);
-       _selMode.init(this, "ModeSel", (gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NC);
+       _selMode.init(this, "ModeSel", (gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NO);
 
        /*binding to HMI's functions (actions)*/
        _btnUP.setAction(&HMI::_up);
@@ -107,7 +107,7 @@ void HMI::updateStatus()
 
        if (getRePaintStatus())
        {
-              ESP_LOGI(TAG, "Repainting...");
+              //ESP_LOGI(TAG, "Repainting...");
               _printScreen();
               setRePaintStatus(false);
        }
@@ -269,7 +269,7 @@ void HMI::_setMenuCanvas()
 
 void HMI::setRePaintStatus(bool status)
 {
-       ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
+       //ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
        if (pthread_mutex_lock(&_rePaintStatusM) == 0)
        {
               _rePaint = status;

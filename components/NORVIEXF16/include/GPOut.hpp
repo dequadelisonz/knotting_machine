@@ -27,6 +27,7 @@ private:
         const char *TAG = "GPOutPin";
 
         /*
+            **address 0x27**
             NORVI-EX-F16 MCP23017
             GPIOA
                 0x1 =Q4
@@ -48,58 +49,115 @@ private:
                 0x40=Q14
                 0x80=Q15
 
+            **address 0x23**
+
+            GPIOA
+                0x1 =Q1
+                0x2=Q2
+                0x4=Q3
+                0x8=Q4
+                0x10=Q5
+                0x20=Q6
+                0x40=Q7
+                0x80=Q8
+
+            GPIOB
+                0x1=Q9
+                0x2=Q10
+                0x4=Q11
+                0x8=Q12
+                0x10=Q13
+                0x20=Q14
+                0x40=Q15
+                0x80=Q16
+
+
+
         */
 
-        static constexpr uint8_t swOnMap[MAX_GPOut] = {0x2,   // Q1
-                                                       0x4,   // Q2
-                                                       0x8,   // Q3
-                                                       0x1,   // Q4
-                                                       0x20,  // Q5
-                                                       0x40,  // Q6
-                                                       0x80,  // Q7
-                                                       0x10,  // Q8
-                                                       0x2,   // Q9
-                                                       0x4,   // Q10
-                                                       0x8,   // Q11
-                                                       0x1,   // Q12
-                                                       0x20,  // Q13
-                                                       0x40,  // Q14
-                                                       0x80,  // Q15
-                                                       0x10}; // Q16
+        static constexpr uint8_t swOnMap[MAX_EXPANSIONS][MAX_GPOut] = {
+            {
+                0x2,  // Q1
+                0x4,  // Q2
+                0x8,  // Q3
+                0x1,  // Q4
+                0x20, // Q5
+                0x40, // Q6
+                0x80, // Q7
+                0x10, // Q8
+                0x2,  // Q9
+                0x4,  // Q10
+                0x8,  // Q11
+                0x1,  // Q12
+                0x20, // Q13
+                0x40, // Q14
+                0x80, // Q15
+                0x10  // Q16
+            },
+            {
+                0x1,  // Q1                                                                                                                                               0x2,  // Q1
+                0x2,  // Q2
+                0x4,  // Q3
+                0x8,  // Q4
+                0x10, // Q5
+                0x20, // Q6
+                0x40, // Q7
+                0x80, // Q8
+                0x1,  // Q9
+                0x2,  // Q10
+                0x4,  // Q11
+                0x8,  // Q12
+                0x10, // Q13
+                0x20, // Q14
+                0x40, // Q15
+                0x80  // Q16
 
-        static constexpr uint8_t swOffMap[MAX_GPOut] = {0xFD,  // Q1
-                                                        0xFB,  // Q2
-                                                        0xF7,  // Q3
-                                                        0xFE,  // Q4
-                                                        0xDF,  // Q5
-                                                        0xBF,  // Q6
-                                                        0x7F,  // Q7
-                                                        0xEF,  // Q8
-                                                        0xFD,  // Q9
-                                                        0xFB,  // Q10
-                                                        0xF7,  // Q11
-                                                        0xFE,  // Q12
-                                                        0xDF,  // Q13
-                                                        0xBF,  // Q14
-                                                        0x7F,  // Q15
-                                                        0xEF}; // Q16
+            },
+            {0},{0},{0},{0}};
+
+        static constexpr uint8_t swOffMap[MAX_EXPANSIONS][MAX_GPOut] = {
+            {
+                0xFD, // Q1
+                0xFB, // Q2
+                0xF7, // Q3
+                0xFE, // Q4
+                0xDF, // Q5
+                0xBF, // Q6
+                0x7F, // Q7
+                0xEF, // Q8
+                0xFD, // Q9
+                0xFB, // Q10
+                0xF7, // Q11
+                0xFE, // Q12
+                0xDF, // Q13
+                0xBF, // Q14
+                0x7F, // Q15
+                0xEF  // Q16
+            },
+            {
+                0xFE, // Q1
+                0xFD, // Q2
+                0xFB, // Q3
+                0xF7, // Q4
+                0xEF, // Q5
+                0xDF, // Q6
+                0xBF, // Q7
+                0x7F, // Q8
+                0xFE, // Q9
+                0xFD, // Q10
+                0xFB, // Q11
+                0xF7, // Q12
+                0xEF, // Q13
+                0xDF, // Q14
+                0xBF, // Q15
+                0x7F  // Q16
+
+            },
+            {0},{0},{0},{0}};
 
         uint8_t _expansionId = 0;
         uint8_t _pinInExpansion = 0;
         NORVIEXF16::gpioGroupEnum _group = NORVIEXF16::gpioGroupEnum::GPIOA;
-        uint8_t _bitMaskOn;
-        uint8_t _bitMaskOff;
-
-        void _logSetting()
-        {
-            // printf("\n");
-            // ESP_LOGI(TAG, "expansion: %d", _expansionId);
-            // ESP_LOGI(TAG, "pin in expansion: %d", _pinInExpansion+1);
-            // ESP_LOGI(TAG, "group: %s", (_group == NORVIEXF16::gpioGroupEnum::GPIOA ? "GPIOA" : "GPIOB"));
-            // ESP_LOGI(TAG, "bitmask on: %x", _bitMaskOn);
-            // ESP_LOGI(TAG, "bitmask off: %x", _bitMaskOff);
-            // printf("\n");
-        }
 
     public:
         GPOutPin(){};

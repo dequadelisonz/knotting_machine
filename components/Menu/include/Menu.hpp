@@ -38,7 +38,7 @@ namespace MenuNs
             // memcpy(_descr, descr, len);
             // _descr[len] = '\0';
             strncpy(_descr, descr, MAX_NAME_LENGTH - 1);
-            ESP_LOGI(TAG, "Now ME descr is: %s", _descr); // TODO solo debug
+            //ESP_LOGI(TAG, "Now ME descr is: %s", _descr); // TODO solo debug
         }
 
     public:
@@ -248,7 +248,7 @@ namespace MenuNs
                 }
                 cur = cur->_next;
             } while (cur->_prev != _childsTail);
-            ESP_LOGI(TAG, "\n%s", _printOut); // TODO rimuovere dopo debug
+            //ESP_LOGI(TAG, "\n%s", _printOut); // TODO rimuovere dopo debug
             return _printOut;
         };
 

@@ -51,13 +51,12 @@ bool KnotEngine::_updateFromWIFI()
 
 void KnotEngine::setRunStatus(uint8_t status)
 {
-    ESP_LOGI(TAG, "Set run status to %d from thread:%s\n", status, pcTaskGetName(nullptr));
+    //ESP_LOGI(TAG, "Set run status to %d from thread:%s\n", status, pcTaskGetName(nullptr));
     if (pthread_mutex_lock(&_cycleStatusM) == 0)
     {
         _run = status;
         // Unlock once operations are done
         pthread_mutex_unlock(&_cycleStatusM);
-        printf("_run status: %d\n", _run);
         if (_run == 1U)
             setRunningStatus(1U);
         _hmi.setRePaintStatus(true);
@@ -69,7 +68,6 @@ void KnotEngine::setRunningStatus(uint8_t status)
     if ((getRunningStatus() != status) && (pthread_mutex_lock(&_cycleStatusM) == 0))
     {
         _runningStatus = status;
-        printf("_running status: %d\n", _runningStatus);
         pthread_mutex_unlock(&_cycleStatusM);
     }
 }

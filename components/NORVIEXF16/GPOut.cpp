@@ -2,9 +2,7 @@
 
 GPOutArray::GPOutPin::GPOutPin(uint8_t pin) : _expansionId(pin / MAX_GPOut),
                                               _pinInExpansion(pin % MAX_GPOut),
-                                              _group((NORVIEXF16::gpioGroupEnum)(_pinInExpansion / (MAX_GPOut / 2))),
-                                              _bitMaskOn(swOnMap[_pinInExpansion]),
-                                              _bitMaskOff(swOffMap[_pinInExpansion])
+                                              _group((NORVIEXF16::gpioGroupEnum)(_pinInExpansion / (MAX_GPOut / 2)))
 {
 }
 
@@ -24,7 +22,7 @@ GPOutArray::GPOutArray(const uint8_t addresses[MAX_EXPANSIONS])
     for (int i = 0; i < (_expansionQty * MAX_GPOut); ++i)
     {
         _pins[i] = GPOutPin(i);
-        set(i,0); //set all pins to 0
+        set(i, 0); // set all pins to 0
     }
 }
 
@@ -40,17 +38,17 @@ esp_err_t GPOutArray::_setGPOStatus(uint8_t const gpo, uint8_t v, bool const on)
     esp_err_t ret = ESP_OK;
     if (!((gpo < 1) || (gpo > (MAX_GPOut * _expansionQty))))
     {
-        uint8_t pinId = gpo - 1;
-        uint8_t currentExp = _pins[pinId]._expansionId;
+        GPOutPin &pin = _pins[gpo - 1];
+        uint8_t currentExp = pin._expansionId;
         uint8_t currentByte = 0U;
         ret = _expansions[currentExp]._readRegister(NORVIEXF16::MCP23017_GPIO,
-                                                    _pins[pinId]._group,
+                                                    pin._group,
                                                     &currentByte);
         if (ret == ESP_OK)
         {
             v = on ? (v | currentByte) : (v & currentByte);
             ret = _expansions[currentExp]._writeRegister(NORVIEXF16::MCP23017_GPIO,
-                                                         _pins[pinId]._group,
+                                                         pin._group,
                                                          v);
         }
     }
@@ -68,9 +66,10 @@ esp_err_t GPOutArray::_setGPOStatus(uint8_t const gpo, uint8_t v, bool const on)
 esp_err_t GPOutArray::set(uint8_t gpo, uint8_t status)
 {
     uint8_t v = 0U;
+    GPOutPin &pin = _pins[gpo - 1];
     if (status == 1)
-        v = _pins[gpo - 1].swOnMap[_pins[gpo - 1]._pinInExpansion];
+        v = pin.swOnMap[pin._expansionId][pin._pinInExpansion];
     else
-        v = _pins[gpo - 1].swOffMap[_pins[gpo - 1]._pinInExpansion];
+        v = pin.swOffMap[pin._expansionId][pin._pinInExpansion];
     return _setGPOStatus(gpo, v, status);
 }
