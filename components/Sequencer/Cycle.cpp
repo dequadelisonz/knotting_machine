@@ -13,7 +13,7 @@ Cycle::Cycle()
 esp_err_t Cycle::_pushPass(Pass const &pass)
 {
     esp_err_t ret = ESP_OK;
-    if (_lastId > MAX_PASSES)
+    if (_lastId >= MAX_PASSES)
     {
         ret = ESP_ERR_INVALID_SIZE;
         ESP_LOGE(TAG, "Max nr. of passes in group array was exceeded,"
