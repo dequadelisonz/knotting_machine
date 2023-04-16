@@ -35,7 +35,7 @@ void Downloader::_wifiEventHandler(void *arg, esp_event_base_t event_base,
             esp_wifi_connect();
             s_retry_num++;
             ESP_LOGI(TAG, "retry to connect to the AP");
-            vTaskDelay(1000/portTICK_PERIOD_MS);
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
         else
         {
@@ -64,7 +64,7 @@ void Downloader::_wifiInitSta(void) // helper to startup WIFI
 
         if ((_ret == ESP_OK) || (_ret == ESP_ERR_INVALID_STATE))
         {
-            esp_netif_create_default_wifi_sta();
+            _accessPoint = esp_netif_create_default_wifi_sta();
             wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 
             _ret = esp_wifi_init(&cfg);
@@ -362,7 +362,6 @@ void Downloader::_download()
                      sc,
                      esp_http_client_get_content_length(_client));
             strcpy(_cycleCode, Downloader::s_output_buffer);
-            // ESP_LOGI(TAG, "Downloaded cycle: %s\n", _cycleCode);
         }
         else
         {
@@ -370,7 +369,8 @@ void Downloader::_download()
             _cycleCode[0] = '\0'; // empty _cycleString if download went wrong
         }
         esp_http_client_cleanup(_client);
-        esp_wifi_disconnect();
-        esp_wifi_stop();
     }
+    esp_wifi_disconnect();
+    esp_wifi_stop();
+    esp_netif_destroy_default_wifi(_accessPoint);
 }

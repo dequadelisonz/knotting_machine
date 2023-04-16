@@ -26,7 +26,7 @@ public:
 
     ~ImporterWIFI()
     {
-        ESP_LOGI(TAG, "Downloaded cycle: %s\n", _cycleCode);
+        ESP_LOGI(TAG, "\nDownloaded cycle: \n%s\n", _cycleCode);
     }
 };
 

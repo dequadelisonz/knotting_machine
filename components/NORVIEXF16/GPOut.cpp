@@ -16,6 +16,7 @@ GPOutArray::GPOutArray(const uint8_t addresses[MAX_EXPANSIONS])
     for (int i = 0; ((i < MAX_EXPANSIONS) && (addresses[i] != 0)); ++i)
     {
         _expansions[i]._setAddress(addresses[i]);
+        _expansions[i]._reset();
         _expansionQty = i + 1; // store nr of expansion inialized with addresses
     }
 

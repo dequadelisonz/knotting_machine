@@ -17,7 +17,6 @@ class NORVIEXF16
     friend class GPOutArray;
 
 private:
-
     const char *TAG = "NORVIEXF16";
 
     /*
@@ -60,6 +59,11 @@ private:
 
     I2CMasterSocket &_i2cSocket;
 
+    void _reset();
+
+    esp_err_t _writeRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gpioGroupEnum group, uint8_t v);
+    esp_err_t _readRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gpioGroupEnum group, uint8_t *data);
+
     uint8_t mcpRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gpioGroupEnum group)
     {
         return (group == GPIOA) ? (reg << 1) : (reg << 1) | 1;
@@ -67,10 +71,6 @@ private:
 
     void _setAddress(uint8_t address) { _address = address; };
     uint8_t _getAddress() const { return _address; };
-
-    esp_err_t _writeRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gpioGroupEnum group, uint8_t v);
-
-    esp_err_t _readRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gpioGroupEnum group, uint8_t *data);
 
 public:
     NORVIEXF16();

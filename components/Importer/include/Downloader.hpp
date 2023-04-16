@@ -73,6 +73,8 @@ private:
 
   esp_http_client_handle_t _client;
 
+  esp_netif_t *_accessPoint = nullptr;
+
   esp_err_t _ret = ESP_ERR_INVALID_STATE;
 
   static void _wifiEventHandler(void *arg, esp_event_base_t event_base,

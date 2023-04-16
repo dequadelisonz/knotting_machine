@@ -2,12 +2,6 @@
 
 Cycle::Cycle()
 {
-    // ESP_LOGI(TAG, "Initializing passes array...");
-    //  for (int i = 0; i < MAX_PASSES; ++i) //TODO verificare se iniziaizza lo stesso
-    //  {
-    //      _passes[i] = _nullPass;
-    //  }
-    // ESP_LOGI(TAG, "Passes array initialized...");
 }
 
 esp_err_t Cycle::_pushPass(Pass const &pass)

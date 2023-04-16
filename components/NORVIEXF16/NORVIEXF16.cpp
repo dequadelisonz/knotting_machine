@@ -5,6 +5,10 @@ NORVIEXF16::NORVIEXF16() : _i2cSocket(I2CMasterSocket::getIstance(_I2C_NUM,
                                                                   GPIO_NUM_17,
                                                                   GPIO_NUM_15))
 {
+}
+
+void NORVIEXF16::_reset()
+{
     _writeRegister(MCP23017_IODIR, GPIOA, 0x00);
     _writeRegister(MCP23017_IODIR, GPIOB, 0x00);
 }
@@ -32,7 +36,7 @@ esp_err_t NORVIEXF16::_readRegister(NORVIEXF16::registerEnum reg, NORVIEXF16::gp
     i2c_master_write_byte(cmd, (_address << 1) | I2C_MASTER_WRITE, true);
     i2c_master_write_byte(cmd, r, true);
     i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(_I2C_NUM, cmd, 10 / portTICK_PERIOD_MS); 
+    esp_err_t ret = i2c_master_cmd_begin(_I2C_NUM, cmd, 10 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
     if (ret == ESP_FAIL)
     {
