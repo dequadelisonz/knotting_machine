@@ -108,7 +108,7 @@ public:
 
         // std::thread ctrlThread(&SequenceEngine::controlThread, this);
 
-        auto cfg = createConfig("Sequence thread", 0, 16384, 5);
+        auto cfg = createConfig("Sequence thread", 0, 20480, 5);
         esp_pthread_set_cfg(&cfg);
         ESP_LOGI(TAG, "Creating seq thread");
         std::thread seqThread(&SequenceEngine::sequenceThread, this);

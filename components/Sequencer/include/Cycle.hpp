@@ -16,7 +16,7 @@ class Cycle
 
 private:
     const char *TAG = "Cycle";
-    static const int16_t MAX_PASSES = 200U; // define max number of groups in cycle
+    static const int16_t MAX_PASSES = 100U; // define max number of groups in cycle
 
     uint16_t _lastId = 0U;
 

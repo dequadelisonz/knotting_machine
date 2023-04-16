@@ -60,11 +60,7 @@ void Downloader::_wifiInitSta(void) // helper to startup WIFI
 
     if (_ret == ESP_OK)
     {
-        ESP_LOGI(TAG, "ret prima: %d", _ret);
-
         _ret = esp_event_loop_create_default();
-
-        ESP_LOGI(TAG, "ret dopo: %d", _ret);
 
         if ((_ret == ESP_OK) || (_ret == ESP_ERR_INVALID_STATE))
         {

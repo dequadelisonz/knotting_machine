@@ -4,6 +4,10 @@
 /*STL includes*/
 
 /*ESP-IDF includes*/
+#include "esp_log.h"
+
+//TODO uncomment to check heap consumption
+// #include "esp_heap_caps.h" 
 
 /*This project includes*/
 #include "SDDriver.hpp"
@@ -29,6 +33,7 @@ protected:
 
 public:
     Importer(Sequencer &sequencer);
+    ~Importer();
 
     const char *getCycleCode() const { return _cycleCode; }
 

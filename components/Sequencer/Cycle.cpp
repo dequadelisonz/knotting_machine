@@ -1,13 +1,13 @@
 #include "Cycle.hpp"
 
-Cycle::Cycle() 
+Cycle::Cycle()
 {
-    //ESP_LOGI(TAG, "Initializing passes array...");
-    // for (int i = 0; i < MAX_PASSES; ++i) //TODO verificare se iniziaizza lo stesso
-    // {
-    //     _passes[i] = _nullPass;
-    // }
-    //ESP_LOGI(TAG, "Passes array initialized...");
+    // ESP_LOGI(TAG, "Initializing passes array...");
+    //  for (int i = 0; i < MAX_PASSES; ++i) //TODO verificare se iniziaizza lo stesso
+    //  {
+    //      _passes[i] = _nullPass;
+    //  }
+    // ESP_LOGI(TAG, "Passes array initialized...");
 }
 
 esp_err_t Cycle::_pushPass(Pass const &pass)
@@ -36,11 +36,12 @@ void Cycle::_reset()
 
 void Cycle::_logContent()
 {
+    ESP_LOGI(TAG, "\n****************CYCLE LOGGING START***************");
     for (int i = 0; i < _lastId; ++i)
     {
         ESP_LOGI(TAG, "Logging pass %d\n", i);
         _passes[i]._logContent();
         printf("\n");
     }
-    ESP_LOGI(TAG, "****************LOGGING END***************");
+    ESP_LOGI(TAG, "****************CYCLE LOGGING END***************");
 }

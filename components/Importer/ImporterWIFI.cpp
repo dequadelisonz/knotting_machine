@@ -2,6 +2,7 @@
 
 ImporterWIFI::ImporterWIFI(Sequencer &sequencer) : Importer(sequencer)
 {
+    ESP_LOGI(TAG,"Initing ImporterWIFI...");
     if (_isInit)
     {
         _readConnInfo();

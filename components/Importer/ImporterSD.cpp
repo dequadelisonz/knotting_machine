@@ -2,7 +2,7 @@
 
 ImporterSD::ImporterSD(Sequencer &sequencer) : Importer(sequencer)
 {
-    printf("Constructing an importerSD...\n");
+    ESP_LOGI(TAG,"Initializing an importer SD...");
     _isImported = _readSD();
     if (isImported())
         _syncCycle();
@@ -10,7 +10,7 @@ ImporterSD::ImporterSD(Sequencer &sequencer) : Importer(sequencer)
 
 bool ImporterSD::_readSD()
 {
-    printf("ImporterSD _readSD.\n");
+    ESP_LOGI(TAG,"Reading SD card...");
     esp_err_t ret = ESP_ERR_NOT_FOUND;
     if (_isInit)
         ret = _sd.readFile(_cycleCode, _cycleFileFullPath);
