@@ -18,15 +18,12 @@ class RemoteInput : public RemoteInputBase
 private:
     const char *TAG = "RemoteInput";
 
-    static const uint8_t MAX_NAME_LENGTH = 12U; // inclding final null char
-
 protected:
     TClass *_context;
-    char _name[MAX_NAME_LENGTH] = {0};
 
-    const uint64_t DEBOUNCE_TIME = 200U; // set a debounce time
+    static const uint32_t DEBOUNCE_TIME = 200U; // set a debounce time
 
-    bool _active = true;
+    bool _active = true; // TODO serve?
     bool _status = false;
     bool _prevStatus = false;
     bool _reading = false;
@@ -38,17 +35,9 @@ protected:
 public:
     RemoteInput(){};
 
-    void init(TClass *context, const char *name)
+    void setAction(TClass *context, void (TClass::*fpt)())
     {
         _context = context;
-        // clipping name to max allowed length
-        int len = (strlen(name) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(name);
-        memcpy(_name, name, len);
-        _name[len] = '\0';
-    }
-
-    void setAction(void (TClass::*fpt)())
-    {
         _action.setCallback(_context, fpt);
     }
 
@@ -81,7 +70,7 @@ public:
 
     virtual void onStatusChange(bool cond) = 0; // to be overridden to do something real
 
-    const char *getName() const { return _name; }
+    bool getStatus() const { return _status; }
 
     bool &isActive() { return _active; }
 };

@@ -10,7 +10,7 @@
 
 /*This project includes*/
 #include "InputConsole.hpp"
-#include "PushButton.hpp"
+#include "DigitalInput.hpp"
 #include "AnalogButton.hpp"
 #include "Selector.hpp"
 #include "Menu.hpp"
@@ -50,8 +50,8 @@ private:
     AnalogButton<HMI> _btnOK;
 
     // discrete buttons on panel
-    PushButton<HMI> _btnStart;
-    PushButton<HMI> _btnStop;
+    DigitalInput<HMI> _btnStart;
+    DigitalInput<HMI> _btnStop;
     Selector<HMI> _selMode;
 
     // declaring menu entries
@@ -118,7 +118,7 @@ private:
 
         void printStatus()
         {
-            //ESP_LOGI(TAG, "%s", _statusLine);
+            // ESP_LOGI(TAG, "%s", _statusLine);
             _parent._display.displayText(_row, _statusLine, false);
         }
 

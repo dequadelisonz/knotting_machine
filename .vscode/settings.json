@@ -1,10 +1,10 @@
 {
     "C_Cpp.intelliSenseEngine": "Tag Parser",
-    "idf.adapterTargetName": "esp32",
+    "idf.adapterTargetName": "esp32s3",
     "idf.customExtraVars": "{}",
     "idf.espIdfPath": "/home/paolo/esp/esp-idf",
     "idf.openOcdConfigs": [
-        "board/esp32-wrover-kit-3.3v.cfg"
+        "board/esp32s3-builtin.cfg"
     ],
     "idf.port": "/dev/ttyUSB0",
     "idf.pythonBinPath": "/home/paolo/.espressif/python_env/idf5.0_py3.10_env/bin/python",

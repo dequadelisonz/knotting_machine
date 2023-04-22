@@ -23,7 +23,7 @@ private:
     {
         friend class GPOutArray;
 
-    public:
+    private:
         const char *TAG = "GPOutPin";
 
         /*
@@ -113,7 +113,10 @@ private:
                 0x80  // Q16
 
             },
-            {0},{0},{0},{0}};
+            {0},
+            {0},
+            {0},
+            {0}};
 
         static constexpr uint8_t swOffMap[MAX_EXPANSIONS][MAX_GPOut] = {
             {
@@ -153,7 +156,10 @@ private:
                 0x7F  // Q16
 
             },
-            {0},{0},{0},{0}};
+            {0},
+            {0},
+            {0},
+            {0}};
 
         uint8_t _expansionId = 0;
         uint8_t _pinInExpansion = 0;
@@ -168,10 +174,19 @@ private:
 
     GPOutPin _pins[MAX_EXPANSIONS * MAX_GPOut];
 
+    GPOutArray(const uint8_t addresses[MAX_EXPANSIONS]);
+
+    GPOutArray(const GPOutArray &) = delete;
+    GPOutArray &operator=(const GPOutArray) = delete;
+
     esp_err_t _setGPOStatus(uint8_t const gpo, uint8_t v, bool const on);
 
 public:
-    GPOutArray(const uint8_t addresses[MAX_EXPANSIONS]);
+    static GPOutArray &_getInstance(const uint8_t addresses[MAX_EXPANSIONS])
+    {
+        static GPOutArray _instance(addresses);
+        return _instance;
+    }
 
     esp_err_t set(uint8_t gpo, uint8_t status);
 };

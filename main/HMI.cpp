@@ -46,23 +46,23 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
 
        /*preparing hardware remote inputs (buttons, etc.)*/
 
-       _btnUP.init(this, "UP", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::UP);
-       _btnDOWN.init(this, "DOWN", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::DOWN);
-       _btnOK.init(this, "OK", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::OK);
+       _btnUP.init(ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::UP);
+       _btnDOWN.init(ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::DOWN);
+       _btnOK.init(ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::OK);
 
-       _btnStart.init(this, "Start", (gpio_num_t)CONFIG_START_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NO);
-       _btnStop.init(this, "Stop", (gpio_num_t)CONFIG_STOP_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NC);
-       _selMode.init(this, "ModeSel", (gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NO);
+       _btnStart.init((gpio_num_t)CONFIG_START_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NO);
+       _btnStop.init((gpio_num_t)CONFIG_STOP_BUTTON_GPIO, RemoteInputBase::eRemInputLogic::NC);
+       _selMode.init((gpio_num_t)CONFIG_MODE_SELECTOR_GPIO, RemoteInputBase::eRemInputLogic::NO);
 
        /*binding to HMI's functions (actions)*/
-       _btnUP.setAction(&HMI::_up);
-       _btnDOWN.setAction(&HMI::_down);
-       _btnOK.setAction(&HMI::_OK);
+       _btnUP.setAction(this, &HMI::_up);
+       _btnDOWN.setAction(this, &HMI::_down);
+       _btnOK.setAction(this, &HMI::_OK);
 
-       _btnStart.setAction(&HMI::_start);
-       _btnStop.setAction(&HMI::_stop);
-       _selMode.setActionOn(&HMI::_selON);
-       _selMode.setActionOff(&HMI::_selOFF);
+       _btnStart.setAction(this, &HMI::_start);
+       _btnStop.setAction(this, &HMI::_stop);
+       _selMode.setActionOn(this, &HMI::_selON);
+       _selMode.setActionOff(this, &HMI::_selOFF);
 
        // register remote inputs (buttons,etc.) in input console
        ret = true;
@@ -107,7 +107,7 @@ void HMI::updateStatus()
 
        if (getRePaintStatus())
        {
-              //ESP_LOGI(TAG, "Repainting...");
+              // ESP_LOGI(TAG, "Repainting...");
               _printScreen();
               setRePaintStatus(false);
        }
@@ -269,7 +269,7 @@ void HMI::_setMenuCanvas()
 
 void HMI::setRePaintStatus(bool status)
 {
-       //ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
+       // ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
        if (pthread_mutex_lock(&_rePaintStatusM) == 0)
        {
               _rePaint = status;

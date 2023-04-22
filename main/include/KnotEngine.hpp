@@ -33,7 +33,7 @@ private:
     static pthread_mutex_t _cycleStatusM;
 
     const uint8_t _expAddresses[GPOutArray::MAX_EXPANSIONS] = {0x27U, 0x23U, 0x0U, 0x0U, 0x0U, 0x0U}; // TODO inserire in menuconfig
-    GPOutArray _gpOutArr;
+    GPOutArray &_gpOutArr;
 
     // const TickType_t delay = 2000 / portTICK_PERIOD_MS; // TODO rimuovere dopo test
 

@@ -1,5 +1,5 @@
-#ifndef PushButton_hpp
-#define PushButton_hpp
+#ifndef DigitalInput_hpp
+#define DigitalInput_hpp
 
 /*STL includes*/
 
@@ -8,31 +8,28 @@
 /*This project includes*/
 #include "RemoteInput.hpp"
 
-/*This class defines an object PushButton with PULLUP internal setting*/
+/*This class defines an object DigitalInput with PULLUP internal setting*/
 template <typename TClass>
-class PushButton : public RemoteInput<TClass>
+class DigitalInput : public RemoteInput<TClass>
 {
 
 private:
-    const char *TAG = "PushButton";
+    const char *TAG = "DigitalInput";
 
     gpio_num_t _pin; // not inherited because could not always be a pin
 
     RemoteInputBase::eRemInputLogic _logic;
 
 protected:
-    const uint64_t DEBOUNCE_TIME = 200U; // set a debounce time
+    static const uint32_t DEBOUNCE_TIME = 200U; // set a debounce time
 
 public:
-    PushButton(){};
+    DigitalInput(){};
 
-    void init(TClass *context,
-         const char *name,
-         gpio_num_t pin,
-         RemoteInputBase::eRemInputLogic logic)
+    void init(gpio_num_t pin,
+              RemoteInputBase::eRemInputLogic logic)
 
     {
-        RemoteInput<TClass>::init(context, name);
         _logic = logic;
         _pin = pin;
         // Change GPIO mapping for control push buttons and selector

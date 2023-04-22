@@ -19,18 +19,17 @@ private:
   RemoteInputBase::eRemInputLogic _logic;
 
 protected:
-  const uint64_t DEBOUNCE_TIME = 200U; // set a debounce time
+  // TODO make static and change to uint32_t
+  static const uint32_t DEBOUNCE_TIME = 200U; // set a debounce time
   Functor<TClass> _actionOn, _actionOff;
 
 public:
   Selector(){};
 
-  void init(TClass *context,
-            const char *name,
-            gpio_num_t pin,
-            RemoteInputBase::eRemInputLogic logic)
+  void init(
+      gpio_num_t pin,
+      RemoteInputBase::eRemInputLogic logic)
   {
-    RemoteInput<TClass>::init(context, name);
     _logic = logic;
     _pin = pin;
     // Change GPIO mapping for control push buttons and selector
@@ -38,13 +37,15 @@ public:
     ESP_ERROR_CHECK(gpio_set_pull_mode(pin, GPIO_PULLUP_ONLY));
   }
 
-  void setActionOn(void (TClass::*fpt)())
+  void setActionOn(TClass *context, void (TClass::*fpt)())
   {
+    this->_context = context;
     _actionOn.setCallback(this->_context, fpt);
   }
 
-  void setActionOff(void (TClass::*fpt)())
+  void setActionOff(TClass *context, void (TClass::*fpt)())
   {
+    this->_context = context;
     _actionOff.setCallback(this->_context, fpt);
   }
 

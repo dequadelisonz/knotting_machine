@@ -15,7 +15,8 @@ class AnalogButton : public RemoteInput<TClass>
 {
 
 protected:
-    const uint64_t DEBOUNCE_TIME = 300U; // set a debounce time
+    // TODO make debounce time static and change to UINT32_t
+    static const uint32_t DEBOUNCE_TIME = 300U; // set a debounce time
 
 private:
     const char *TAG = "AnalogButton";
@@ -29,12 +30,9 @@ private:
 public:
     AnalogButton(){};
 
-    void init(TClass *context,
-              const char *name,
-              int adcChannel,
+    void init(int adcChannel,
               RemoteInputBase::eBtnLevel btnLevel)
     {
-        RemoteInput<TClass>::init(context, name);
         _adcChannel = (adc1_channel_t)adcChannel;
         _btnLevel = btnLevel;
         esp_adc_cal_characterize(ADC_UNIT_1,
@@ -48,10 +46,10 @@ public:
 
     void updateStatus() override
     {
-        //TODO solo debug int raw = adc1_get_raw(_adcChannel);
-        // printf("%d\n", raw);
-        // this->_reading = (raw / 1000) == _btnLevel;
-        this->_reading = (adc1_get_raw(_adcChannel)/ 1000) == _btnLevel;
+        // TODO solo debug int raw = adc1_get_raw(_adcChannel);
+        //  printf("%d\n", raw);
+        //  this->_reading = (raw / 1000) == _btnLevel;
+        this->_reading = (adc1_get_raw(_adcChannel) / 1000) == _btnLevel;
         RemoteInput<TClass>::updateStatus();
     }
 
