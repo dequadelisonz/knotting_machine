@@ -7,7 +7,7 @@ KnotEngine::KnotEngine() : _hmi(*this), _gpOutArr(_expAddresses)
     if (pthread_mutex_init(&KnotEngine::_cycleStatusM, NULL) != 0)
     {
         ESP_LOGE(TAG, "Failed to init mutex");
-        _readyToRun = false;
+        _mutexReady = false;
     }
 }
 

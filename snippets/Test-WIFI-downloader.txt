@@ -1,0 +1,53 @@
+#include "KnotEngine.hpp"
+
+#define TAG "MAIN"
+
+#define WITH_THREAD
+
+class TestInit
+{
+private:
+    Sequencer seq;
+
+    esp_pthread_cfg_t createConfig(const char *name, int core_id, int stack, int prio)
+    {
+        auto cfg = esp_pthread_get_default_config();
+        cfg.thread_name = name;
+        cfg.pin_to_core = core_id;
+        cfg.stack_size = stack;
+        cfg.prio = prio;
+        return cfg;
+    }
+
+    void sequenceThread()
+    {
+        ESP_LOGI(TAG, "starting routine");
+        ImporterWIFI impW(seq);
+    }
+
+public:
+    TestInit()
+    {
+#ifdef WITH_THREAD
+        auto cfg = createConfig("Sequence thread", 0, 20480, 5);
+        esp_pthread_set_cfg(&cfg);
+        ESP_LOGI(TAG, "Creating seq thread");
+        std::thread seqThread(&TestInit::sequenceThread, this);
+        seqThread.join();
+#else
+        sequenceThread();
+#endif
+    }
+};
+
+extern "C" void app_main(void)
+{
+    // esp_log_level_set("*", ESP_LOG_DEBUG);
+
+    //  ESP_LOGI(TAG, "starting main");
+
+    //  TestInit ti;
+
+    KnotEngine ke;
+    ke.start();
+}

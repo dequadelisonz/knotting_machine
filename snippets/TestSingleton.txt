@@ -1,0 +1,32 @@
+#ifndef TestSingleton_hpp
+#define TestSingleton_hpp
+
+/*STL includes*/
+
+/*ESP-IDF includes*/
+
+/*This project includes*/
+
+class TestSingleton
+{
+private:
+    const char *TAG = "TestSingleton";
+
+    const uint8_t _id;
+
+    TestSingleton(int id) : _id(id) {}
+
+    TestSingleton(const TestSingleton &) = delete;
+    TestSingleton &operator=(const TestSingleton) = delete;
+
+public:
+    static TestSingleton &getInstance(int id)
+    {
+        static TestSingleton _instance(id);
+        return _instance;
+    }
+
+    int getFoo(int x) const { return _id + x; }
+};
+
+#endif

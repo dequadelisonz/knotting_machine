@@ -25,7 +25,7 @@ private:
     uint64_t _timer = 0U;
 
     bool _isAtBegin = true;
-    bool _readyToRun = true;
+    bool _mutexReady = true;
 
     uint8_t _run = 0U;
     uint8_t _runningStatus = 0U; // used to activate or deactivate HMI statuses
@@ -57,26 +57,26 @@ public:
     /*running on control thread*/
     virtual bool onControlCreate()
     {
-        return _readyToRun;
+        return _mutexReady;
     }
     virtual bool onControlUpdate(uint64_t elapsedTime)
     {
         _hmi.updateStatus();
-        return _readyToRun;
+        return _mutexReady;
     }
 
     /*running on sequence thread*/
     virtual bool onSequenceCreate()
     {
-        return (this->_updateFromSD() && _readyToRun);
+        return (this->_updateFromSD() && _mutexReady);
     }
 
     virtual bool onSequenceUpdate(uint64_t elapsedTime)
     {
         switch (getSelMode())
         {
-        case 0:
-            if (getRunStatus() == 1)
+        case 0U:
+            if (getRunStatus() == 1U)
             {
                 while (_curOffset == _sequencer.getCurOffset()) // then cycle through a group to perform passes
                 {
@@ -89,11 +89,11 @@ public:
                     _sequencer.advance();
                 }
                 _curOffset = _sequencer.getCurOffset(); // set the current offset ready for the next group of passes
-                setRunStatus(0);                        // set _run to 0 after performing the pass
+                setRunStatus(0U);                        // set _run to 0 after performing the pass
             }
-
             break;
-        case 1:
+            
+        case 1U:
             // if running status is no more 1 and cycle arrives at the beginning (!_isAtBegin == 0) then stop the cycle because user pushed the stop button
             if (getRunStatus() || !_isAtBegin)
             {
@@ -102,11 +102,11 @@ public:
                 {
                     while (_curOffset == _sequencer.getCurOffset())
                     {
-                        // printf("id: %d,\tdescr: %s,\tpin: %d\tstatus: %s\n",
-                        //        _sequencer.getCurId(),
-                        //        _sequencer.getCurDescription(),
-                        //        _sequencer.getCurPin(),
-                        //        _sequencer.getCurStatus() ? "on" : "off");
+                        printf("id: %d,\tdescr: %s,\tpin: %d\tstatus: %s\n",
+                               _sequencer.getCurId(),
+                               _sequencer.getCurDescription(),
+                               _sequencer.getCurPin(),
+                               _sequencer.getCurStatus() ? "on" : "off");
                         _gpOutArr.set(_sequencer.getCurPin(), _sequencer.getCurStatus());
                         _isAtBegin = _sequencer.advance();
                         /*
@@ -122,8 +122,8 @@ public:
                             if ((_batchQty - _processedItems) == 0)
                             {
                                 // TODO mettere qui codice gestione sirena
-                                setRunStatus(0);
-                                _processedItems = 0;
+                                setRunStatus(0U);
+                                _processedItems = 0U;
                             }
                         }
                     };
@@ -131,7 +131,7 @@ public:
                 else
                 {
                     _timer = 0U;
-                    _curDuration = (uint64_t)(_sequencer.getCurDuration() * 1000000 * getKspeed());
+                    _curDuration = (uint64_t)(_sequencer.getCurDuration() * 1000000U * getKspeed());
                     _curOffset = _sequencer.getCurOffset();
                 }
 
@@ -142,13 +142,12 @@ public:
                 // if getRunStatus() = 0 and _isAtBegin=0 then set _runningStatus to 0
                 setRunningStatus(0U);
             }
-
             break;
         }
 
         _timer += elapsedTime;
 
-        return _readyToRun;
+        return _mutexReady;
     }
 
     void setRunStatus(uint8_t status);

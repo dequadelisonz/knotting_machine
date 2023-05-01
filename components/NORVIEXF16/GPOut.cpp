@@ -66,6 +66,7 @@ esp_err_t GPOutArray::_setGPOStatus(uint8_t const gpo, uint8_t v, bool const on)
  */
 esp_err_t GPOutArray::set(uint8_t gpo, uint8_t status)
 {
+    // ESP_LOGI(TAG,"Setting pin %d to status %d\n",gpo,status);//TODO solo debug
     uint8_t v = 0U;
     GPOutPin &pin = _pins[gpo - 1];
     if (status == 1)

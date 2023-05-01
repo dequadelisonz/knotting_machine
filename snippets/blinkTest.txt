@@ -1,0 +1,18 @@
+    const uint8_t exps[GPOutArray::MAX_EXPANSIONS] = {0x27, 0x23, 0x0, 0x0, 0x0, 0x0};
+    GPOutArray gpa(exps);
+
+    TickType_t delay = 2000 / portTICK_PERIOD_MS;
+
+    while (1)
+    {
+        for (int i = 1; i < 33; ++i)
+        {
+            gpa.set(i, 1);
+        }
+        vTaskDelay(delay);
+        for (int i = 1; i < 33; ++i)
+        {
+            gpa.set(i, 0);
+        }
+        vTaskDelay(delay);
+    }

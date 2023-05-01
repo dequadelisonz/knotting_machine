@@ -41,9 +41,12 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        ret = ret && _menu.pushEntry(&_WifiUpdME);
 
        if (!ret) // TODO implementare un controllo errori migliore
+       {
               ESP_LOGE(TAG,
                        "Some menu entry were not added, check for maximum menu entry availability.");
-
+              return;
+       }
+       
        /*preparing hardware remote inputs (buttons, etc.)*/
 
        _btnUP.init(this, "UP", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::UP);
