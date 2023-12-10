@@ -14,6 +14,9 @@ class ImporterWIFI : public Importer
 private:
     const char *TAG = "ImporterWIFI";
 
+    // const char *DUMMY_PARAM = "?download=0&dummy=1";
+    const char *NO_DUMMY_PARAM = "?download=0&dummy=0";
+
     char _WIFI_SSID[Downloader::_WIFI_SSID_LEN] = {0};
     char _WIFI_PWD[Downloader::_WIFI_PWD_LEN] = {0};
     char _APP_SCRIPT_URL[Downloader::_APP_SCR_LEN] = {0};

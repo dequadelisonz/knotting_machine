@@ -2,8 +2,9 @@
 
 pthread_mutex_t KnotEngine::_cycleStatusM = 0;
 
-KnotEngine::KnotEngine() : _hmi(*this), _gpOutArr(_expAddresses)
+KnotEngine::KnotEngine(const char *ver) : _hmi(*this), _gpOutArr(_expAddresses)
 {
+    strncat(_version, ver, MAX_CHAR_VERS - 1);
     if (pthread_mutex_init(&KnotEngine::_cycleStatusM, NULL) != 0)
     {
         ESP_LOGE(TAG, "Failed to init mutex");
@@ -51,7 +52,7 @@ bool KnotEngine::_updateFromWIFI()
 
 void KnotEngine::setRunStatus(uint8_t status)
 {
-    //ESP_LOGI(TAG, "Set run status to %d from thread:%s\n", status, pcTaskGetName(nullptr));
+    // ESP_LOGI(TAG, "Set run status to %d from thread:%s\n", status, pcTaskGetName(nullptr));
     if (pthread_mutex_lock(&_cycleStatusM) == 0)
     {
         _run = status;

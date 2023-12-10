@@ -46,7 +46,7 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
                        "Some menu entry were not added, check for maximum menu entry availability.");
               return;
        }
-       
+
        /*preparing hardware remote inputs (buttons, etc.)*/
 
        _btnUP.init(this, "UP", ADC1_CHANNEL_4, RemoteInputBase::eBtnLevel::UP);
@@ -80,15 +80,17 @@ HMI::HMI(KnotEngine &knotEngine) : _knotEngine(knotEngine),
        if (!ret) // TODO implementare un controllo errori migliore
               ESP_LOGE(TAG,
                        "Some remote inputs were not added, check for maximum remote availability.");
+}
 
+void HMI::splashScreen()
+{
        _display.clearScreen(false);
        _display.contrast(0xff);
-
        _display.displayText(0, "Macchina", true);
        _display.displayText(1, "     Annodatrice", true);
-       _display.displayText(3, "*** v. 1.0 ***", true);
-
-       // ESP_LOGD(TAG, "Exiting constructor."); // TODO solo per debug
+       char ver[_CHARS_IN_ROW] = {0};
+       sprintf(ver, "*** v. %s ***", _knotEngine._version);
+       _display.displayText(3, ver, true);
 }
 
 void HMI::updateStatus()
@@ -110,7 +112,7 @@ void HMI::updateStatus()
 
        if (getRePaintStatus())
        {
-              //ESP_LOGI(TAG, "Repainting...");
+              // ESP_LOGI(TAG, "Repainting...");
               _printScreen();
               setRePaintStatus(false);
        }
@@ -272,7 +274,7 @@ void HMI::_setMenuCanvas()
 
 void HMI::setRePaintStatus(bool status)
 {
-       //ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
+       // ESP_LOGI(TAG, "Set repaint status to %s from thread:%s\n", status ? "true" : "false", pcTaskGetName(nullptr));
        if (pthread_mutex_lock(&_rePaintStatusM) == 0)
        {
               _rePaint = status;

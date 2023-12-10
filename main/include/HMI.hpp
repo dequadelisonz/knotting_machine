@@ -135,6 +135,8 @@ private:
 public:
     HMI(KnotEngine &knotEngine);
 
+    void splashScreen();
+
     void updateStatus();
 
     void printStatus(const char *status6, const char *status7);

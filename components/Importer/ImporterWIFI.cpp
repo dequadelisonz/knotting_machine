@@ -2,10 +2,11 @@
 
 ImporterWIFI::ImporterWIFI(Sequencer &sequencer) : Importer(sequencer)
 {
-    ESP_LOGI(TAG,"Initing ImporterWIFI...");
+    ESP_LOGI(TAG, "Initing ImporterWIFI...");
     if (_isInit)
     {
         _readConnInfo();
+        strcat(_APP_SCRIPT_URL, NO_DUMMY_PARAM);
         _isImported = _download();
         if (isImported())
         {

@@ -42,9 +42,7 @@ public:
     {
         _context = context;
         // clipping name to max allowed length
-        int len = (strlen(name) >= (MAX_NAME_LENGTH - 1)) ? (MAX_NAME_LENGTH - 1) : strlen(name);
-        memcpy(_name, name, len);
-        _name[len] = '\0';
+        strncat(_name, name, MAX_NAME_LENGTH - 1);
     }
 
     void setAction(void (TClass::*fpt)())

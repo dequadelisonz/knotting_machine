@@ -20,9 +20,6 @@ Pass::Pass(int id,
 {
     // clipping name to max allowed length
     strncat(_description,descr,MAX_CHAR_DESCR-1);
-    // int len = (strlen(descr) >= (MAX_CHAR_DESCR - 1)) ? (MAX_CHAR_DESCR - 1) : strlen(descr);
-    // memcpy(_description, descr, len);
-    // _description[len] = '\0';
 }
 
 void Pass::operator=(const Pass &pass)

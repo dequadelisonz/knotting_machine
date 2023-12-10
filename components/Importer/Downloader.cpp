@@ -17,6 +17,7 @@ Downloader::Downloader(const char *const wifiSSID,
                                                 _APP_SCRIPT_URL(appScriptUrl),
                                                 _cycleCode(cycleCode)
 {
+    memset(s_output_buffer, 0, sizeof(s_output_buffer));
     _connect();
     _download();
 }

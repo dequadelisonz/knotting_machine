@@ -18,8 +18,13 @@ class KnotEngine : public SequenceEngine
 
     friend class HMI;
 
+public:
+    static const uint8_t MAX_CHAR_VERS = 4U;
+
 private:
     const char *TAG = "KnotEngine";
+    char _version[MAX_CHAR_VERS] = {0};
+
     Sequencer _sequencer;
     HMI _hmi;
     uint64_t _timer = 0U;
@@ -52,7 +57,7 @@ private:
     bool _updateFromWIFI();
 
 public:
-    KnotEngine();
+    KnotEngine(const char *ver);
 
     /*running on control thread*/
     virtual bool onControlCreate()
@@ -68,6 +73,7 @@ public:
     /*running on sequence thread*/
     virtual bool onSequenceCreate()
     {
+        _hmi.splashScreen();
         return (this->_updateFromSD() && _mutexReady);
     }
 
@@ -89,10 +95,10 @@ public:
                     _sequencer.advance();
                 }
                 _curOffset = _sequencer.getCurOffset(); // set the current offset ready for the next group of passes
-                setRunStatus(0U);                        // set _run to 0 after performing the pass
+                setRunStatus(0U);                       // set _run to 0 after performing the pass
             }
             break;
-            
+
         case 1U:
             // if running status is no more 1 and cycle arrives at the beginning (!_isAtBegin == 0) then stop the cycle because user pushed the stop button
             if (getRunStatus() || !_isAtBegin)

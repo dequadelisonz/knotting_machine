@@ -7,9 +7,6 @@
 extern "C" void app_main(void)
 {
     // esp_log_level_set("*", ESP_LOG_DEBUG);
-
-    KnotEngine ke;
+    KnotEngine ke("1.0");
     ke.start();
-
-
 }
